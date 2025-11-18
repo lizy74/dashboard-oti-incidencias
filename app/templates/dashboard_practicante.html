@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+
+{% block title %}Mi Dashboard{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<div class="mb-8">
+    <h1 class="text-3xl font-bold text-base-content mb-2 flex items-center gap-3">
+        <div class="p-3 bg-secondary/10 rounded-lg">
+            <i class="mdi mdi-view-dashboard-outline text-2xl text-secondary"></i>
+        </div>
+        Mi Dashboard
+    </h1>
+    <p class="text-base-content/60">Tus incidentes y estadísticas personales</p>
+</div>
+
+<!-- Stats Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+    <!-- Mis Incidentes -->
+    <div class="card bg-gradient-to-br from-blue-50 to-blue-100 shadow border-l-4 border-blue-500">
+        <div class="card-body">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-semibold opacity-70">Mis Incidentes</p>
+                    <p class="text-3xl font-bold text-blue-600">{{ total_mis_incidentes }}</p>
+                </div>
+                <div class="text-5xl opacity-20">
+                    <i class="mdi mdi-clipboard-list-outline"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Total Resueltos -->
+    <div class="card bg-gradient-to-br from-green-50 to-green-100 shadow border-l-4 border-green-500">
+        <div class="card-body">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-semibold opacity-70">Total de Resueltos</p>
+                    <p class="text-3xl font-bold text-green-600">{{ total_resueltos }}</p>
+                </div>
+                <div class="text-5xl opacity-20">
+                    <i class="mdi mdi-check-circle-outline"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+    <div class="card bg-base-100 shadow-lg border border-base-300">
+        <div class="card-body">
+            <h3 class="card-title text-lg mb-4 flex items-center gap-2">
+                <i class="mdi mdi-chart-bar text-primary"></i> Mis Incidentes por Prioridad
+            </h3>
+            <canvas id="chartMisPrioridad"></canvas>
+        </div>
+    </div>
+
+    <div class="card bg-base-100 shadow-lg border border-base-300">
+        <div class="card-body">
+            <h3 class="card-title text-lg mb-4 flex items-center gap-2">
+                <i class="mdi mdi-doughnut text-primary"></i> Mis Incidentes por Tipo
+            </h3>
+            <canvas id="chartMisTipo"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- Últimos Incidentes -->
+<div class="card bg-base-100 shadow-lg border border-base-300">
+    <div class="card-body">
+        <h3 class="card-title text-lg mb-6 flex items-center gap-2">
+            <i class="mdi mdi-clock-outline text-primary"></i> Mis Últimos 5 Incidentes
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {% if ultimos_mis_incidentes %}
+                {% for inc in ultimos_mis_incidentes %}
+                <div class="card bg-base-200 border-l-4 border-primary hover:shadow-lg transition">
+                    <div class="card-body">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="font-bold text-primary text-lg">#{{ inc.id }}</span>
+                            <span class="badge {% if inc.prioridad.upper() == 'ALTA' %}badge-error{% elif inc.prioridad.upper() == 'MEDIA' %}badge-warning{% else %}badge-success{% endif %}">
+                                {{ inc.prioridad }}
+                            </span>
+                        </div>
+                        <p class="text-sm mb-3 line-clamp-2">{{ inc.descripcion[:80] }}...</p>
+                        <div class="flex items-center justify-between text-xs opacity-70">
+                            <span class="flex items-center gap-1">
+                                <i class="mdi mdi-calendar-outline"></i> {{ inc.fecha_incidente|fecha_es }}
+                            </span>
+                            <a href="{{ url_for('incidentes.detalle', id=inc.id) }}" class="link link-primary font-semibold">
+                                Ver <i class="mdi mdi-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="col-span-full text-center py-12 opacity-60">
+                    <i class="mdi mdi-inbox-multiple-outline text-5xl mb-2 block opacity-30"></i>
+                    <p>No hay incidentes registrados aún</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const ctxMisPrioridad = document.getElementById('chartMisPrioridad').getContext('2d');
+    new Chart(ctxMisPrioridad, {
+        type: 'bar',
+        data: {
+            labels: ['Alta', 'Media', 'Baja'],
+            datasets: [{
+                label: 'Mis Incidentes',
+                data: [{{ mis_alta }}, {{ mis_media }}, {{ mis_baja }}],
+                backgroundColor: ['#ef4444', '#f59e0b', '#10b981'],
+                borderRadius: 8,
+                borderSkipped: false
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true } }
+        }
+    });
+
+    const ctxMisTipo = document.getElementById('chartMisTipo').getContext('2d');
+    new Chart(ctxMisTipo, {
+        type: 'pie',
+        data: {
+            labels: [{% for tipo, count in mis_por_tipo.items() %}'{{ tipo }}',{% endfor %}],
+            datasets: [{
+                data: [{% for tipo, count in mis_por_tipo.items() %}{{ count }},{% endfor %}],
+                backgroundColor: ['#2563eb', '#9c27b0', '#ff9800', '#607d8b']
+            }]
+        },
+        options: { responsive: true }
+    });
+</script>
+{% endblock %}

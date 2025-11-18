@@ -1,0 +1,310 @@
+{% extends "base.html" %}
+
+{% block title %}Lista de Incidentes{% endblock %}
+
+{% block content %}
+<!-- Header with Action -->
+<div class="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <div>
+        <h1 class="text-3xl font-bold text-base-content mb-2 flex items-center gap-3">
+            <div class="p-3 bg-info/10 rounded-lg">
+                <i class="mdi mdi-folder-alert-outline text-2xl text-info"></i>
+            </div>
+            Incidentes Registrados
+        </h1>
+        <p class="text-base-content/60">Gestiona todos los incidentes del sistema</p>
+    </div>
+    <a href="{{ url_for('incidentes.nuevo') }}" class="btn btn-primary gap-2">
+        <i class="mdi mdi-plus-circle-outline"></i> Nuevo Incidente
+    </a>
+</div>
+
+<!-- Filters Card -->
+<div class="card bg-base-100 shadow-lg border border-base-300 mb-6">
+    <div class="card-body">
+        <h3 class="card-title text-lg mb-4 flex items-center gap-2">
+            <i class="mdi mdi-filter-outline"></i> Filtros
+        </h3>
+        <form method="GET" class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                <!-- Search Input -->
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text">Buscar</span>
+                    </label>
+                    <input type="text" 
+                           name="busqueda" 
+                           placeholder="DNI, nombre, descripción..."
+                           value="{{ busqueda }}"
+                           class="input input-bordered input-sm focus:input-primary">
+                </div>
+
+                <!-- Priority Filter -->
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text">Prioridad</span>
+                    </label>
+                    <select name="prioridad" class="select select-bordered select-sm focus:select-primary">
+                        <option value="">Todas</option>
+                        {% for p in prioridades %}
+                        <option value="{{ p }}" {% if prioridad==p %}selected{% endif %}>{{ p }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Type Filter -->
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text">Tipo</span>
+                    </label>
+                    <select name="tipo" class="select select-bordered select-sm focus:select-primary">
+                        <option value="">Todos</option>
+                        {% for t in tipos_incidente %}
+                        <option value="{{ t }}" {% if tipo==t %}selected{% endif %}>{{ t }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Practitioner Filter -->
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text">Practicante</span>
+                    </label>
+                    <select name="practicante_id" class="select select-bordered select-sm focus:select-primary">
+                        <option value="">Todos</option>
+                        {% for p in practicantes %}
+                        <option value="{{ p.id }}" {% if practicante_id==p.id|string %}selected{% endif %}>
+                            {{ p.nombre_completo }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Actions -->
+                <div class="form-control flex justify-end pt-6">
+                    <div class="flex gap-2">
+                        <button type="submit" class="btn btn-sm btn-primary">
+                            <i class="mdi mdi-filter-check-outline"></i> Filtrar
+                        </button>
+                        <a href="{{ url_for('incidentes.lista') }}" class="btn btn-sm btn-outline">
+                            <i class="mdi mdi-refresh"></i> Limpiar
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Incidents Grid - 2 COLUMNS LAYOUT -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+    {% for inc in incidentes.items %}
+    <div class="card bg-base-100 shadow-lg border border-base-300 hover:shadow-xl transition flex flex-col">
+        <div class="card-body flex flex-col h-full">
+            <!-- Header -->
+            <div class="flex flex-col sm:flex-row justify-between items-start gap-3 pb-4 border-b border-base-200">
+                <div class="flex items-center gap-3">
+                    <span class="badge badge-lg font-bold text-lg">#{{ inc.id }}</span>
+                    <span class="badge {% if inc.prioridad.upper() == 'ALTA' %}badge-error{% elif inc.prioridad.upper() == 'MEDIA' %}badge-warning{% else %}badge-success{% endif %}">
+                        {{ inc.prioridad }}
+                    </span>
+                </div>
+                
+                <!-- Actions -->
+                <div class="flex flex-wrap gap-1 sm:gap-2">
+                    <button class="btn btn-sm btn-info gap-1" onclick="verPDF({{ inc.id }})">
+                        <i class="mdi mdi-file-pdf-outline"></i> PDF
+                    </button>
+                    <a href="{{ url_for('incidentes.detalle', id=inc.id) }}" class="btn btn-sm btn-outline gap-1">
+                        <i class="mdi mdi-eye-outline"></i> Ver
+                    </a>
+                    <a href="{{ url_for('incidentes.editar', id=inc.id) }}" class="btn btn-sm btn-outline gap-1">
+                        <i class="mdi mdi-pencil-outline"></i> Editar
+                    </a>
+                    {% if current_user.rol == 'admin' %}
+                    <form method="POST" action="{{ url_for('incidentes.eliminar', id=inc.id) }}" style="display:inline;">
+                        <button type="submit" class="btn btn-sm btn-error gap-1" onclick="return confirm('¿Eliminar este incidente?')">
+                            <i class="mdi mdi-delete-outline"></i>
+                        </button>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Date and Location -->
+            <div class="grid grid-cols-2 gap-2 py-3">
+                <div>
+                    <p class="text-xs opacity-70 font-semibold">
+                        <i class="mdi mdi-calendar-outline"></i> Fecha
+                    </p>
+                    <p class="font-medium text-sm">{{ inc.fecha_incidente|fecha_es }}</p>
+                </div>
+                <div>
+                    <p class="text-xs opacity-70 font-semibold">
+                        <i class="mdi mdi-clock-outline"></i> Hora
+                    </p>
+                    <p class="font-medium text-sm">{{ inc.hora|hora_es }}</p>
+                </div>
+                <div>
+                    <p class="text-xs opacity-70 font-semibold">
+                        <i class="mdi mdi-map-marker-outline"></i> Sede
+                    </p>
+                    <p class="font-medium text-sm">{{ inc.sede }}</p>
+                </div>
+                <div>
+                    <p class="text-xs opacity-70 font-semibold">
+                        <i class="mdi mdi-alert-box-outline"></i> Tipo
+                    </p>
+                    <p class="font-medium text-sm">{{ inc.tipo_incidente_display }}</p>
+                </div>
+            </div>
+
+            <!-- User Info -->
+            <div class="bg-base-200 rounded-lg p-3 my-3">
+                <p class="font-semibold mb-2 flex items-center gap-2 text-sm">
+                    <i class="mdi mdi-account-outline"></i> {{ inc.nombre_usuario }}
+                </p>
+                <div class="grid grid-cols-2 gap-1 text-xs opacity-70">
+                    <span>📋 {{ inc.dni }}</span>
+                    <span>📱 {{ inc.celular_encargado or 'N/A' }}</span>
+                </div>
+            </div>
+
+            <!-- Description -->
+            <p class="text-sm mb-3 flex-grow">
+                <strong>Descripción:</strong>
+                <p class="mt-1 opacity-80">{{ inc.descripcion[:100] }}{% if inc.descripcion|length > 100 %}...{% endif %}</p>
+            </p>
+
+            <!-- Assigned To -->
+            {% if inc.personal_asignado %}
+            <div class="mb-3">
+                <p class="text-xs opacity-70 font-semibold mb-2">
+                    <i class="mdi mdi-account-multiple-outline"></i> Asignado a:
+                </p>
+                <div class="flex flex-wrap gap-1">
+                    {% for nombre in inc.personal_asignado.split(',') %}
+                    <span class="badge badge-sm badge-primary">{{ nombre.strip() }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Footer -->
+            <div class="text-xs opacity-60 pt-3 border-t border-base-200 mt-auto">
+                Registrado: {{ inc.fecha_registro.strftime('%d/%m/%Y %H:%M') }}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Empty State -->
+{% if not incidentes.items %}
+<div class="card bg-base-100 shadow-lg border border-base-300">
+    <div class="card-body text-center py-12">
+        <i class="mdi mdi-inbox-multiple-outline text-6xl opacity-20 mb-4 block"></i>
+        <h3 class="text-2xl font-bold mb-2">No hay incidentes</h3>
+        <p class="text-opacity-70 mb-4">No se encontraron incidentes con los filtros seleccionados</p>
+        <a href="{{ url_for('incidentes.nuevo') }}" class="btn btn-primary gap-2 mx-auto">
+            <i class="mdi mdi-plus-circle-outline"></i> Crear Incidente
+        </a>
+    </div>
+</div>
+{% endif %}
+
+<!-- Pagination -->
+{% if incidentes.pages > 1 %}
+<div class="flex justify-center gap-2 my-8 flex-wrap">
+    {% if incidentes.has_prev %}
+    <a href="{{ url_for('incidentes.lista', page=incidentes.prev_num, busqueda=busqueda, prioridad=prioridad, tipo=tipo) }}"
+        class="btn btn-outline btn-sm">
+        <i class="mdi mdi-chevron-left"></i> Anterior
+    </a>
+    {% endif %}
+
+    {% for p in incidentes.iter_pages() %}
+        {% if p %}
+        <a href="{{ url_for('incidentes.lista', page=p, busqueda=busqueda, prioridad=prioridad, tipo=tipo) }}"
+            class="btn btn-sm {% if p == incidentes.page %}btn-primary{% else %}btn-outline{% endif %}">
+            {{ p }}
+        </a>
+        {% else %}
+        <span class="btn btn-disabled btn-sm">...</span>
+        {% endif %}
+    {% endfor %}
+
+    {% if incidentes.has_next %}
+    <a href="{{ url_for('incidentes.lista', page=incidentes.next_num, busqueda=busqueda, prioridad=prioridad, tipo=tipo) }}"
+        class="btn btn-outline btn-sm">
+        Siguiente <i class="mdi mdi-chevron-right"></i>
+    </a>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Ejecutar SOLO UNA VEZ - Protección contra recargas
+    if (!window.INCIDENTES_PDF_INITIALIZED) {
+        window.INCIDENTES_PDF_INITIALIZED = true;
+        
+        window.verPDF = function(idIncidente) {
+            // Remover modal previo si existe
+            const existingModal = document.getElementById('pdfModal');
+            if (existingModal) {
+                existingModal.remove();
+            }
+            
+            const modal = document.createElement('div');
+            modal.id = 'pdfModal';
+            modal.className = 'modal modal-open';
+            modal.innerHTML = `
+                <div class="modal-box w-11/12 max-w-5xl h-5/6 p-0 flex flex-col">
+                    <div class="sticky top-0 flex justify-between items-center p-4 bg-base-300 text-base-content rounded-t-box border-b border-base-400">
+                        <h3 class="font-bold text-lg flex items-center gap-2">
+                            <i class="mdi mdi-file-pdf-outline text-error"></i> REPORTE INCIDENTE #${idIncidente}
+                        </h3>
+                        <button onclick="document.getElementById('pdfModal').remove()" class="btn btn-sm btn-ghost">
+                            <i class="mdi mdi-close text-lg"></i>
+                        </button>
+                    </div>
+                    
+                    <iframe id="pdfFrame" 
+                            src="/incidentes/ver-pdf/${idIncidente}" 
+                            class="flex-1 w-full border-0"></iframe>
+                    
+                    <div class="sticky bottom-0 flex gap-2 justify-end p-4 bg-base-300 rounded-b-box border-t border-base-400">
+                        <button onclick="document.getElementById('pdfModal').remove()" class="btn btn-sm btn-outline">
+                            <i class="mdi mdi-close"></i> Cerrar
+                        </button>
+                        <button onclick="document.getElementById('pdfFrame').contentWindow.print()" class="btn btn-sm btn-success gap-2">
+                            <i class="mdi mdi-printer-outline"></i> Imprimir / PDF
+                        </button>
+                    </div>
+                </div>
+                <form method="dialog" class="modal-backdrop">
+                    <button onclick="document.getElementById('pdfModal').remove()">close</button>
+                </form>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // Close on Escape
+            const handleEscape = (e) => {
+                if (e.key === 'Escape') {
+                    const pdfModal = document.getElementById('pdfModal');
+                    if (pdfModal) {
+                        pdfModal.remove();
+                        document.removeEventListener('keydown', handleEscape);
+                    }
+                }
+            };
+            document.addEventListener('keydown', handleEscape);
+        };
+        
+        console.log('✅ PDF viewer inicializado correctamente');
+    }
+</script>
+{% endblock %}

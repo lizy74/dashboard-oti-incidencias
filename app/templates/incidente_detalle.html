@@ -1,0 +1,209 @@
+{% extends "base.html" %}
+
+{% block title %}Detalle Incidente #{{ incidente.id }}{% endblock %}
+
+{% block content %}
+<!-- Header with Actions -->
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+    <div>
+        <h1 class="text-3xl font-bold text-base-content mb-2 flex items-center gap-3">
+            <div class="p-3 bg-info/10 rounded-lg">
+                <i class="mdi mdi-file-document-outline text-2xl text-info"></i>
+            </div>
+            Incidente #{{ incidente.id }}
+        </h1>
+        <p class="text-base-content/60">Detalles completos del incidente</p>
+    </div>
+    <div class="flex gap-2">
+        <a href="{{ url_for('incidentes.editar', id=incidente.id) }}" class="btn btn-primary gap-2">
+            <i class="mdi mdi-pencil-outline"></i> Editar
+        </a>
+        <a href="{{ url_for('incidentes.lista') }}" class="btn btn-outline gap-2">
+            <i class="mdi mdi-arrow-left"></i> Volver
+        </a>
+    </div>
+</div>
+
+<!-- Grid de detalles -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+    <!-- Información General -->
+    <div class="card bg-base-100 shadow-lg border border-base-300">
+        <div class="card-body">
+            <h3 class="card-title text-lg mb-4 flex items-center gap-2">
+                <i class="mdi mdi-information-outline text-primary"></i> Información General
+            </h3>
+            <div class="space-y-4">
+                <div class="flex justify-between border-b border-base-200 pb-3">
+                    <span class="font-semibold opacity-70">Fecha del Incidente:</span>
+                    <span>{{ incidente.fecha_incidente|fecha_es }}</span>
+                </div>
+                <div class="flex justify-between border-b border-base-200 pb-3">
+                    <span class="font-semibold opacity-70">Hora:</span>
+                    <span>{{ incidente.hora|hora_es }}</span>
+                </div>
+                <div class="flex justify-between border-b border-base-200 pb-3">
+                    <span class="font-semibold opacity-70">Prioridad:</span>
+                    <span class="badge {% if incidente.prioridad.upper() == 'ALTA' %}badge-error{% elif incidente.prioridad.upper() == 'MEDIA' %}badge-warning{% else %}badge-success{% endif %}">
+                        {{ incidente.prioridad }}
+                    </span>
+                </div>
+                <div class="flex justify-between border-b border-base-200 pb-3">
+                    <span class="font-semibold opacity-70">Tipo:</span>
+                    <span class="badge badge-outline">{{ incidente.tipo_incidente_display }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="font-semibold opacity-70">Sede:</span>
+                    <span class="badge badge-primary">{{ incidente.sede }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Datos del Usuario -->
+    <div class="card bg-base-100 shadow-lg border border-base-300">
+        <div class="card-body">
+            <h3 class="card-title text-lg mb-4 flex items-center gap-2">
+                <i class="mdi mdi-account-outline text-secondary"></i> Usuario
+            </h3>
+            <div class="space-y-4">
+                <div class="flex justify-between border-b border-base-200 pb-3">
+                    <span class="font-semibold opacity-70">Nombre:</span>
+                    <span>{{ incidente.nombre_usuario }}</span>
+                </div>
+                <div class="flex justify-between border-b border-base-200 pb-3">
+                    <span class="font-semibold opacity-70">DNI:</span>
+                    <span class="font-mono">{{ incidente.dni }}</span>
+                </div>
+                <div class="flex justify-between border-b border-base-200 pb-3">
+                    <span class="font-semibold opacity-70">Código:</span>
+                    <span>{{ incidente.codigo_trabajador or '—' }}</span>
+                </div>
+                <div class="flex justify-between border-b border-base-200 pb-3">
+                    <span class="font-semibold opacity-70">Oficina:</span>
+                    <span>{{ incidente.oficina or '—' }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="font-semibold opacity-70">Celular:</span>
+                    <span>{{ incidente.celular_encargado or '—' }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Descripción del Incidente -->
+<div class="card bg-base-100 shadow-lg border border-base-300 mb-6">
+    <div class="card-body">
+        <h3 class="card-title text-lg mb-4 flex items-center gap-2">
+            <i class="mdi mdi-text-box-outline text-accent"></i> Descripción del Incidente
+        </h3>
+        <p class="text-base leading-relaxed whitespace-pre-wrap">{{ incidente.descripcion }}</p>
+    </div>
+</div>
+
+<!-- Personal Asignado -->
+{% if incidente.personal_asignado %}
+<div class="card bg-base-100 shadow-lg border border-base-300 mb-6">
+    <div class="card-body">
+        <h3 class="card-title text-lg mb-4 flex items-center gap-2">
+            <i class="mdi mdi-account-multiple-outline text-warning"></i> Personal Asignado
+        </h3>
+        <div class="flex flex-wrap gap-2">
+            {% for nombre in incidente.personal_asignado.split(',') %}
+            <div class="badge badge-lg badge-primary gap-2">
+                <i class="mdi mdi-account-check"></i>
+                {{ nombre.strip() }}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Solución Aplicada -->
+{% if incidente.detalle_solucion %}
+<div class="card bg-base-100 shadow-lg border-l-4 border-success mb-6">
+    <div class="card-body">
+        <h3 class="card-title text-lg mb-4 flex items-center gap-2">
+            <i class="mdi mdi-check-all text-success"></i> Solución Aplicada
+        </h3>
+        <p class="text-base leading-relaxed">{{ incidente.detalle_solucion }}</p>
+    </div>
+</div>
+{% endif %}
+
+<!-- Observaciones -->
+{% if incidente.observaciones %}
+<div class="card bg-base-100 shadow-lg border border-base-300 mb-6">
+    <div class="card-body">
+        <h3 class="card-title text-lg mb-4 flex items-center gap-2">
+            <i class="mdi mdi-comment-multiple-outline text-info"></i> Observaciones
+        </h3>
+        <p class="text-base leading-relaxed">{{ incidente.observaciones }}</p>
+    </div>
+</div>
+{% endif %}
+
+<!-- Historial de Ediciones -->
+<div class="card bg-base-100 shadow-lg border border-base-300 mb-6">
+    <div class="card-body">
+        <h3 class="card-title text-lg mb-6 flex items-center gap-2">
+            <i class="mdi mdi-history text-primary"></i> Historial de Ediciones
+        </h3>
+        {% if historial %}
+        <div class="space-y-3">
+            {% for h in historial %}
+            <div class="flex gap-4 p-3 bg-base-200 rounded-lg border-l-4 border-primary">
+                <div class="text-2xl flex-shrink-0">
+                    {% if h.accion == 'Creado' %}
+                        <i class="mdi mdi-plus-circle text-success"></i>
+                    {% elif h.accion == 'Editado' %}
+                        <i class="mdi mdi-pencil text-warning"></i>
+                    {% else %}
+                        <i class="mdi mdi-delete text-error"></i>
+                    {% endif %}
+                </div>
+                <div class="flex-1">
+                    <div class="flex justify-between items-start mb-2">
+                        <strong class="text-base">{{ h.accion }}</strong>
+                        <span class="text-xs opacity-70">{{ h.fecha_edicion.strftime('%d/%m/%Y %H:%M') }}</span>
+                    </div>
+                    <p class="text-sm opacity-70">Por: <strong>{{ h.usuario.nombre_completo }}</strong></p>
+                    {% if h.campo_editado and h.accion == 'Editado' %}
+                    <div class="text-xs opacity-60 mt-2 font-mono">
+                        <p><strong>Campo:</strong> {{ h.campo_editado }}</p>
+                        {% if h.valor_anterior %}
+                        <p class="line-clamp-2"><strong>De:</strong> "{{ h.valor_anterior[:50] }}..."</p>
+                        <p class="line-clamp-2"><strong>A:</strong> "{{ h.valor_nuevo[:50] }}..."</p>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-8 opacity-60">
+            <i class="mdi mdi-history text-3xl mb-2 block opacity-30"></i>
+            <p class="text-sm">No hay historial disponible.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Metadata Footer -->
+<div class="card bg-base-200 shadow border-t-4 border-secondary">
+    <div class="card-body text-xs space-y-2 opacity-70">
+        <p>
+            <i class="mdi mdi-plus-circle"></i>
+            <strong>Registrado:</strong> {{ incidente.fecha_registro.strftime('%d/%m/%Y %H:%M') }} por {{ incidente.registrado_por }}
+        </p>
+        {% if incidente.fecha_ultima_edicion %}
+        <p>
+            <i class="mdi mdi-pencil"></i>
+            <strong>Última edición:</strong> {{ incidente.fecha_ultima_edicion.strftime('%d/%m/%Y %H:%M') }} por {{ incidente.editado_por }}
+        </p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

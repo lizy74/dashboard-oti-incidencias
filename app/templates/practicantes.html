@@ -1,0 +1,286 @@
+{% extends "base.html" %}
+
+{% block title %}Gestión de Practicantes{% endblock %}
+
+{% block content %}
+<!-- Header with Add Button -->
+<div class="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <div>
+        <h1 class="text-3xl font-bold text-base-content mb-2 flex items-center gap-3">
+            <div class="p-3 bg-warning/10 rounded-lg">
+                <i class="mdi mdi-account-school-outline text-2xl text-warning"></i>
+            </div>
+            Gestión de Practicantes OTI
+        </h1>
+        <p class="text-base-content/60">Administra los practicantes del sistema</p>
+    </div>
+    <button onclick="abrirModalAgregar()" class="btn btn-primary gap-2 whitespace-nowrap">
+        <i class="mdi mdi-plus-circle-outline"></i> Nuevo Practicante
+    </button>
+</div>
+
+<!-- Tabla de Practicantes - Full Width -->
+<div class="card bg-base-100 shadow-lg border border-base-300">
+    <div class="card-body">
+        <h3 class="card-title text-lg mb-6 flex items-center gap-2">
+            <i class="mdi mdi-clipboard-list-outline text-info"></i> Lista de Practicantes
+        </h3>
+        
+        <div class="overflow-x-auto">
+            <table class="table table-sm">
+                <thead class="bg-base-200">
+                    <tr>
+                        <th><i class="mdi mdi-account-outline"></i> Nombre</th>
+                        <th><i class="mdi mdi-phone-outline"></i> Número</th>
+                        <th><i class="mdi mdi-email-outline"></i> Email</th>
+                        <th><i class="mdi mdi-briefcase-outline"></i> Especialidad</th>
+                        <th><i class="mdi mdi-toggle-switch-outline"></i> Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in practicantes %}
+                    <tr class="hover:bg-base-200 transition">
+                        <td class="font-medium">{{ p.nombre_completo }}</td>
+                        <td>{{ p.celular }}</td>
+                        <td class="text-sm opacity-80">{{ p.email }}</td>
+                        <td>
+                            <span class="badge badge-outline badge-sm">{{ p.especialidad }}</span>
+                        </td>
+                        <td>
+                            <span class="badge {% if p.activo %}badge-success{% else %}badge-error{% endif %}">
+                                {{ 'Activo' if p.activo else 'Inactivo' }}
+                            </span>
+                        </td>
+                        <td>
+                            <!-- Edit Button -->
+                            <button 
+                                onclick="editarPracticante({{ p.id }}, '{{ p.nombre_completo }}', '{{ p.celular }}', '{{ p.email }}', '{{ p.especialidad }}')"
+                                class="btn btn-sm btn-outline gap-1"
+                                title="Editar">
+                                <i class="mdi mdi-pencil-outline"></i>
+                            </button>
+
+                            <!-- Toggle State -->
+                            <form method="POST" 
+                                  action="{{ url_for('practicantes.toggle_estado', id=p.id) }}"
+                                  style="display:inline;">
+                                <button type="submit" 
+                                        class="btn btn-sm {% if p.activo %}btn-warning{% else %}btn-success{% endif %} gap-1"
+                                        title="{{ 'Desactivar' if p.activo else 'Activar' }}">
+                                    <i class="mdi {% if p.activo %}mdi-toggle-switch-off-outline{% else %}mdi-toggle-switch-outline{% endif %}"></i>
+                                </button>
+                            </form>
+
+                            <!-- Delete Button -->
+                            <form method="POST" 
+                                  action="{{ url_for('practicantes.eliminar', id=p.id) }}"
+                                  style="display:inline;"
+                                  onsubmit="return confirm('¿Seguro que deseas eliminar a {{ p.nombre_completo }}? No se puede deshacer.');">
+                                <button type="submit" 
+                                        class="btn btn-sm btn-error gap-1"
+                                        title="Eliminar">
+                                    <i class="mdi mdi-delete-outline"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            {% if not practicantes %}
+            <div class="text-center py-12 opacity-60">
+                <i class="mdi mdi-inbox-multiple-outline text-5xl mb-2 block opacity-30"></i>
+                <p class="text-sm">No hay practicantes registrados</p>
+                <button onclick="abrirModalAgregar()" class="btn btn-primary gap-2 mt-4">
+                    <i class="mdi mdi-plus-circle-outline"></i> Crear Primer Practicante
+                </button>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- ===================================
+     MODAL AGREGAR PRACTICANTE
+     =================================== -->
+<dialog id="modalAgregar" class="modal">
+    <div class="modal-box w-full max-w-md">
+        <button onclick="cerrarModalAgregar()" class="btn btn-sm btn-ghost float-right">
+            <i class="mdi mdi-close"></i>
+        </button>
+        
+        <h3 class="font-bold text-lg mb-6 flex items-center gap-2">
+            <i class="mdi mdi-plus-circle-outline text-success"></i> Agregar Practicante
+        </h3>
+
+        <form method="POST" action="{{ url_for('practicantes.crear') }}" class="space-y-4">
+            <!-- Nombre Completo -->
+            <div class="form-control w-full">
+                <label class="label">
+                    <span class="label-text font-semibold">Nombre Completo *</span>
+                </label>
+                <input type="text" 
+                       name="nombre_completo" 
+                       placeholder="Ej: Lizbeth Cecilia Apaza Quispe"
+                       class="input input-bordered focus:input-primary"
+                       required>
+            </div>
+
+            <!-- Número (Celular) -->
+            <div class="form-control w-full">
+                <label class="label">
+                    <span class="label-text font-semibold">Número (Celular)</span>
+                </label>
+                <input type="text" 
+                       name="celular" 
+                       placeholder="987654321"
+                       class="input input-bordered focus:input-primary">
+            </div>
+
+            <!-- Email -->
+            <div class="form-control w-full">
+                <label class="label">
+                    <span class="label-text font-semibold">Email *</span>
+                </label>
+                <input type="email" 
+                       name="email" 
+                       placeholder="practicante@unap.edu.pe"
+                       class="input input-bordered focus:input-primary"
+                       required>
+            </div>
+
+            <!-- Especialidad -->
+            <div class="form-control w-full">
+                <label class="label">
+                    <span class="label-text font-semibold">Especialidad</span>
+                </label>
+                <select name="especialidad" class="select select-bordered focus:select-primary">
+                    {% for esp in especialidades %}
+                    <option value="{{ esp }}">{{ esp }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Actions -->
+            <div class="modal-action">
+                <button type="button" onclick="cerrarModalAgregar()" class="btn btn-outline">
+                    Cancelar
+                </button>
+                <button type="submit" class="btn btn-primary gap-2">
+                    <i class="mdi mdi-content-save"></i> Guardar
+                </button>
+            </div>
+        </form>
+    </div>
+    <form method="dialog" class="modal-backdrop">
+        <button>close</button>
+    </form>
+</dialog>
+
+<!-- ===================================
+     MODAL EDITAR PRACTICANTE
+     =================================== -->
+<dialog id="modalEditar" class="modal">
+    <div class="modal-box w-full max-w-md">
+        <button onclick="cerrarModalEditar()" class="btn btn-sm btn-ghost float-right">
+            <i class="mdi mdi-close"></i>
+        </button>
+        
+        <h3 class="font-bold text-lg mb-6 flex items-center gap-2">
+            <i class="mdi mdi-pencil-outline text-primary"></i> Editar Practicante
+        </h3>
+
+        <form id="formEditar" method="POST" class="space-y-4">
+            <!-- Nombre -->
+            <div class="form-control w-full">
+                <label class="label">
+                    <span class="label-text font-semibold">Nombre Completo *</span>
+                </label>
+                <input type="text" id="edit_nombre" name="nombre_completo" 
+                       class="input input-bordered focus:input-primary" required>
+            </div>
+
+            <!-- Celular -->
+            <div class="form-control w-full">
+                <label class="label">
+                    <span class="label-text font-semibold">Número</span>
+                </label>
+                <input type="text" id="edit_celular" name="celular" 
+                       class="input input-bordered focus:input-primary">
+            </div>
+
+            <!-- Email -->
+            <div class="form-control w-full">
+                <label class="label">
+                    <span class="label-text font-semibold">Email *</span>
+                </label>
+                <input type="email" id="edit_email" name="email" 
+                       class="input input-bordered focus:input-primary" required>
+            </div>
+
+            <!-- Especialidad -->
+            <div class="form-control w-full">
+                <label class="label">
+                    <span class="label-text font-semibold">Especialidad</span>
+                </label>
+                <select id="edit_especialidad" name="especialidad" 
+                        class="select select-bordered focus:select-primary">
+                    {% for esp in especialidades %}
+                    <option value="{{ esp }}">{{ esp }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Actions -->
+            <div class="modal-action">
+                <button type="button" onclick="cerrarModalEditar()" class="btn btn-outline">
+                    Cancelar
+                </button>
+                <button type="submit" class="btn btn-primary gap-2">
+                    <i class="mdi mdi-content-save"></i> Actualizar
+                </button>
+            </div>
+        </form>
+    </div>
+    <form method="dialog" class="modal-backdrop">
+        <button>close</button>
+    </form>
+</dialog>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // ===== MODAL AGREGAR =====
+    function abrirModalAgregar() {
+        document.getElementById('modalAgregar').showModal();
+    }
+
+    function cerrarModalAgregar() {
+        document.getElementById('modalAgregar').close();
+    }
+
+    // ===== MODAL EDITAR =====
+    function editarPracticante(id, nombre, celular, email, especialidad) {
+        document.getElementById('formEditar').action = '/practicantes/editar/' + id;
+        document.getElementById('edit_nombre').value = nombre;
+        document.getElementById('edit_celular').value = celular;
+        document.getElementById('edit_email').value = email;
+        document.getElementById('edit_especialidad').value = especialidad;
+        document.getElementById('modalEditar').showModal();
+    }
+
+    function cerrarModalEditar() {
+        document.getElementById('modalEditar').close();
+    }
+
+    // Cerrar modales con ESC
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            document.getElementById('modalAgregar').close();
+            document.getElementById('modalEditar').close();
+        }
+    });
+</script>
+{% endblock %}

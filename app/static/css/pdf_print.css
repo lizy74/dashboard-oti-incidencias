@@ -1,0 +1,147 @@
+/* Estilos para la plantilla PDF */
+@font-face {
+    font-family: Wingdings;
+    panose-1: 5 0 0 0 0 0 0 0 0 0;
+}
+
+@font-face {
+    font-family: "Cambria Math";
+    panose-1: 2 4 5 3 5 4 6 3 2 4;
+}
+
+@font-face {
+    font-family: Aptos, Arial, sans-serif;
+}
+
+p.MsoNormal, li.MsoNormal, div.MsoNormal {
+    margin-top: 0cm;
+    margin-right: 0cm;
+    margin-bottom: 8.0pt;
+    margin-left: 0cm;
+    line-height: 115%;
+    font-size: 12.0pt;
+    font-family: "Aptos", sans-serif;
+}
+
+p.MsoListParagraph, li.MsoListParagraph, div.MsoListParagraph {
+    margin-top: 0cm;
+    margin-right: 0cm;
+    margin-bottom: 8.0pt;
+    margin-left: 36.0pt;
+    line-height: 115%;
+    font-size: 12.0pt;
+    font-family: "Aptos", sans-serif;
+}
+
+.MsoChpDefault {
+    font-size: 12.0pt;
+}
+
+.MsoPapDefault {
+    margin-bottom: 8.0pt;
+    line-height: 115%;
+}
+
+@page {
+    size: A4;
+    margin: 21.3pt 1.0cm 21.3pt 1.0cm;
+}
+
+body {
+    word-wrap: break-word;
+    font-family: "Aptos", Arial, sans-serif;
+    margin: 0;
+    padding: 10px;
+    background: white;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+}
+
+.WordSection1 {
+    width: 100%;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 0 auto;
+    display: table;
+}
+
+td {
+    vertical-align: top;
+    word-wrap: break-word;
+}
+
+.boton-imprimir {
+    display: none !important;
+}
+
+/* ========== ESTILOS PARA IMPRESIÓN ========== */
+@media print {
+    @page {
+        size: A4 portrait;
+        margin: 0.3cm 0.3cm 0.3cm 0.3cm;
+    }
+    
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+    
+    html, body {
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        height: auto !important;
+    }
+    
+    body {
+        display: block !important;
+        background: white !important;
+    }
+    
+    .WordSection1 {
+        max-width: none !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        display: block !important;
+        justify-content: inherit;
+    }
+    
+    table {
+        width: 100% !important;
+        max-width: none !important;
+        margin: 0 !important;
+        border-collapse: collapse !important;
+        page-break-inside: avoid !important;
+    }
+    
+    td {
+        padding: 2pt 2pt !important;
+        word-wrap: break-word !important;
+        font-size: 8pt !important;
+        line-height: 1;
+    }
+    
+    p.MsoNormal, li.MsoNormal, div.MsoNormal {
+        margin: 0 !important;
+        padding: 0 !important;
+        line-height: 100% !important;
+        font-size: 8pt !important;
+    }
+    
+    tr {
+        page-break-inside: avoid !important;
+    }
+    
+    .boton-imprimir {
+        display: none !important;
+    }
+}

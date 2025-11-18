@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="Generator" content="Microsoft Word 15 (filtered)">
+<style>
+/* Font Definitions */
+@font-face {
+    font-family: Wingdings;
+    panose-1: 5 0 0 0 0 0 0 0 0 0;
+}
+@font-face {
+    font-family: "Cambria Math";
+    panose-1: 2 4 5 3 5 4 6 3 2 4;
+}
+@font-face {
+    font-family: Aptos, Arial, sans-serif;
+}
+
+/* Style Definitions */
+p.MsoNormal, li.MsoNormal, div.MsoNormal {
+    margin-top: 0cm;
+    margin-right: 0cm;
+    margin-bottom: 8.0pt;
+    margin-left: 0cm;
+    line-height: 115%;
+    font-size: 12.0pt;
+    font-family: "Aptos", sans-serif;
+}
+
+p.MsoListParagraph, li.MsoListParagraph, div.MsoListParagraph {
+    margin-top: 0cm;
+    margin-right: 0cm;
+    margin-bottom: 8.0pt;
+    margin-left: 36.0pt;
+    line-height: 115%;
+    font-size: 12.0pt;
+    font-family: "Aptos", sans-serif;
+}
+
+.MsoChpDefault {
+    font-size: 12.0pt;
+}
+
+.MsoPapDefault {
+    margin-bottom: 8.0pt;
+    line-height: 115%;
+}
+
+@page {
+    size: A4;
+    margin: 21.3pt 3.0cm 21.3pt 3.0cm;
+}
+
+body {
+    word-wrap: break-word;
+    font-family: "Aptos", Arial, sans-serif;
+}
+
+table {
+    border-collapse: collapse;
+}
+
+td {
+    vertical-align: top;
+}
+
+/* Estilos para impresión */
+@media print {
+    body {
+        margin: 0;
+        padding: 0;
+    }
+    .boton-imprimir {
+        display: none !important;
+    }
+}
+</style>
+</head>
+
+<body>
+<!-- Botón para imprimir/descargar -->
+
+<div class="WordSection1">
+
+<table class="MsoNormalTable" border="1" cellspacing="0" cellpadding="0" style="width:100%;max-width:750px;border-collapse:collapse;border:none;margin:0 auto;">
+
+
+<!-- ENCABEZADO CON LOGO -->
+<tr style="height:35.55pt">
+    
+  <td width="188" colspan="9" style="width:141.05pt;border:solid windowtext 1.0pt;padding:0cm 5.4pt 0cm 5.4pt;height:35.55pt">
+    <p class="MsoNormal" align="center" style="text-align:center;margin-bottom:0cm">
+      <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo" style="max-width:160px; height:auto;">
+    </p>
+  </td>
+
+  <td width="407" colspan="12" style="width:305.45pt;border:solid windowtext 1.0pt;border-left:none;padding:0cm 5.4pt 0cm 5.4pt;height:35.55pt">
+    <p class="MsoNormal" align="center" style="text-align:center;margin-bottom:0cm">
+      <b>FORMATO REGISTRO DE INCIDENTES</b>
+    </p>
+  </td>
+  <td width="135" colspan="3" valign="top" style="width:101.6pt;border:solid windowtext 1.0pt;border-left:none;padding:0cm 5.4pt 0cm 5.4pt;height:35.55pt">
+    <p class="MsoNormal" style="margin-bottom:0cm"><b>MODELO V.02</b></p>
+  </td>
+</tr>
+
+
+
+
+
+ <!-- FILA: N° ATENCIÓN, FECHA, HORA -->
+ <tr style="height:12.75pt">
+  <td width="157" colspan="6" valign="top" style="width:117.4pt;border:solid windowtext 1.0pt;border-top:none;padding:0cm 5.4pt 0cm 5.4pt;height:12.75pt">
+    <p class="MsoNormal" style="margin-bottom:0cm"><b><u>N° ATENCIÓN</u></b></p>
+  </td>
+  <td width="32" colspan="3" valign="top" style="width:23.65pt;border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;padding:0cm 5.4pt 0cm 5.4pt;height:12.75pt">
+    <p class="MsoNormal" style="margin-bottom:0cm"><b>{{ n_atencion }}</b></p>
+  </td>
+  <td width="159" colspan="6" valign="top" style="width:119.05pt;border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;padding:0cm 5.4pt 0cm 5.4pt;height:12.75pt">
+    <p class="MsoNormal" style="margin-bottom:0cm"><b>FECHA DEL INCIDENTE</b></p>
+  </td>
+  <td width="203" colspan="4" valign="top" style="width:152.1pt;border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;padding:0cm 5.4pt 0cm 5.4pt;height:12.75pt">
+    <p class="MsoNormal" style="margin-bottom:0cm"><b>{{ fecha_incidente }}</b></p>
+  </td>
+  <td width="62" colspan="3" valign="top" style="width:46.5pt;border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;padding:0cm 5.4pt 0cm 5.4pt;height:12.75pt">
+    <p class="MsoNormal" align="center" style="text-align:center;margin-bottom:0cm"><b>HORA</b></p>
+  </td>
+  <td width="119" colspan="2" valign="top" style="width:89.4pt;border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;padding:0cm 5.4pt 0cm 5.4pt;height:12.75pt">
+    <p class="MsoNormal" style="margin-bottom:0cm"><b>{{ hora }}</b></p>
+  </td>
+ </tr>
+
+ <!-- SECCIÓN 1: DATOS DEL USUARIO -->
+ <tr style="height:23.9pt">
+  <td width="64" colspan="4" valign="top" style="width:48.2pt;border:solid windowtext 1.0pt;border-top:none;padding:0cm 5.4pt 0cm 5.4pt;height:23.9pt">
+    <p class="MsoNormal" style="margin-bottom:0cm"><b>1</b></p>
+  </td>
+  <td width="667" colspan="20" valign="top" style="width:499.9pt;border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;padding:0cm 5.4pt 0cm 5.4pt;height:23.9pt">
+    <p class="MsoNormal" align="center" style="text-align:center;margin-bottom:0cm"><b>DATOS DEL USUARIO</b></p>
+  </td>
+ </tr>
+
+ <!-- CÓDIGO DE TRABAJADOR Y DNI -->
+ <tr style="height:15.65pt">
+  <td width="241" colspan="10" valign="top" style="width:180.75pt;border:solid windowtext 1.0pt;border-top:none;padding:0cm 5.4pt 0cm 5.4pt;height:15.65pt">
+    <p class="MsoNormal" align="center" style="margin-bottom:0cm;text-align:center"><b>CÓDIGO DE TRABAJADOR</b></p>
+  </td>
+  <td width="251" colspan="7" valign="top" style="width:188.05pt;border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;padding:0cm 5.4pt 0cm 5.4pt;height:15.65pt">
+    <p class="MsoNormal" style="margin-bottom:0cm">{{ codigo_trabajador }}</p>
+  </td>
+  <td width="58" colspan="2" valign="top" style="width:43.4pt;border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;padding:0cm 5.4pt 0cm 5.4pt;height:15.65pt">
+    <p class="MsoNormal" style="margin-bottom:0cm"><b>DNI</b></p>
+  </td>
+  <td width="181" colspan="5" valign="top" style="width:135.9pt;border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;padding:0cm 5.4pt 0cm 5.4pt;height:15.65pt">
+    <p class="MsoNormal" style="margin-bottom:0cm">{{ dni }}</p>
+  </td>
+ </tr>
+
+ <!-- NOMBRE DE USUARIO -->
+ <tr style="height:3.95pt">
+  <td width="241" colspan="10" valign="top" style="width:180.75pt;border:solid windowtext 1.0pt;border-top:none;padding:0cm 5.4pt 0cm 5.4pt;height:3.95pt">
+    <p class="MsoNormal" align="center" style="margin-bottom:0cm;text-align:center"><b>NOMBRE DE USUARIO</b></p>
+  </td>
+  <td width="490" colspan="14" valign="top" style="width:367.35pt;border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;padding:0cm 5.4pt 0cm 5.4pt;height:3.95pt">
+    <p class="MsoNormal" style="margin-bottom:0cm">{{ nombre_usuario }}</p>
+  </td>
+ </tr>
+
+ <!-- OFICINA -->
+ <tr style="height:7.1pt">
+  <td width="241" colspan="10" valign="top" style="width:180.75pt;border:solid windowtext 1.0pt;border-top:none;padding:0cm 5.4pt 0cm 5.4pt;height:7.1pt">
+    <p class="MsoNormal" align="center" style="margin-bottom:0cm;text-align:center"><b>OFICINA</b></p>
+  </td>
+  <td width="490" colspan="14" valign="top" style="width:367.35pt;border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;padding:0cm 5.4pt 0cm 5.4pt;height:7.1pt">
+    <p class="MsoNormal" style="margin-bottom:0cm">{{ oficina }}</p>
+  </td>
+ </tr>
+
+<!-- SEDE -->
+<tr style="height:25.25pt">
+  <td width="86" colspan="5" valign="top" style="width:64.45pt;border:solid windowtext 1.0pt;border-top:none;padding:0cm 5.4pt 0cm 5.4pt;height:25.25pt">
+    <p class="MsoNormal" style="margin-bottom:0cm"><b>SEDE</b></p>
+  </td>
+  <td width="71" valign="top" style="width:52.95pt;border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;padding:0cm 5.4pt 0cm 5.4pt;height:25.25pt">
+    <p class="MsoNormal" style="margin-bottom:0cm">C.U.</p>
+  </td>
+  <td width="26" colspan="2" valign="top" style="width:19.4pt;border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;padding:0cm 5.4pt 0cm 5.4pt;height:25.25pt">
+    <p class="MsoNormal" align="center" style="text-align:center;margin-bottom:0cm"><b>{% if sede and 'C.U.' in sede.upper() %}X{% endif %}</b></p>
+  </td>
+  <td width="98" colspan="3" valign="top" style="width:73.7pt;border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;padding:0cm 5.4pt 0cm 5.4pt;height:25.25pt">
+    <p class="MsoNormal" style="margin-bottom:0cm">Ed. Cont.</p>
+  </td>
+  <td width="28" valign="top" style="width:21.25pt;border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;padding:0cm 5.4pt 0cm 5.4pt;height:25.25pt">
+    <p class="MsoNormal" align="center" style="text-align:center;margin-bottom:0cm"><b>{% if sede and 'ED. CONT' in sede.upper() %}X{% endif %}</b></p>
+  </td>
+  <td width="57" colspan="4" valign="top" style="width:42.5pt;border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;padding:0cm 5.4pt 0cm 5.4pt;height:25.25pt">
+    <p class="MsoNormal" style="margin-bottom:0cm">Otro</p>
+  </td>
+  <td width="365" colspan="8" valign="top" style="width:273.85pt;border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;padding:0cm 5.4pt 0cm 5.4pt;height:25.25pt">
+    <p class="MsoNormal" style="margin-bottom:0cm"><b>{% if sede and sede.upper() == 'OTRO' %}X{% elif sede and 'C.U.' not in sede.upper() and 'ED. CONT' not in sede.upper() %}X - {{ sede }}{% endif %}</b></p>
+  </td>
+</tr>
+
+
+ <!-- SECCIÓN 2: INFORMACIÓN CON RESPECTO AL INCIDENTE -->
+ <tr style="height:22.95pt">
+  <td width="63" colspan="3" valign="top" style="width:47.5pt;border:solid windowtext 1.0pt;border-top:none;padding:0cm 5.4pt 0cm 5.4pt;height:22.95pt">
+    <p class="MsoNormal" style="margin-bottom:0cm"><b>2</b></p>
+  </td>
+  <td width="667" colspan="21" valign="top" style="width:500.6pt;border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;padding:0cm 5.4pt 0cm 5.4pt;height:22.95pt">
+    <p class="MsoNormal" style="margin-bottom:0cm"><b>INFORMACIÓN CON RESPECTO AL INCIDENTE</b></p>
+  </td>
+ </tr>
+
+<!-- TIPO DE INCIDENTE: INTERNET, SOFTWARE, HARDWARE -->
+<tr style="height:11.25pt">
+  <td width="174" colspan="7" valign="top" style="width:130.5pt;border:solid windowtext 1.0pt;border-top:none;padding:0cm 5.4pt 0cm 5.4pt;height:11.25pt">
+    <p class="MsoNormal" style="margin-bottom:0cm"><b>INTERNET</b></p>
+  </td>
+  <td width="67" colspan="3" valign="top" style="width:50.25pt;border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;padding:0cm 5.4pt 0cm 5.4pt;height:11.25pt">
+    <p class="MsoNormal" align="center" style="text-align:center;margin-bottom:0cm"><b>{% if tipo_incidente and 'INTERNET' in tipo_incidente.upper() %}X{% endif %}</b></p>
+  </td>
+  <td width="490" colspan="14" rowspan="4" valign="top" style="width:367.35pt;border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;padding:0cm 5.4pt 0cm 5.4pt;height:11.25pt">
+    <p class="MsoListParagraph" style="margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:17.65pt;text-indent:-17.65pt">
+      <span style="font-family:Wingdings">▶</span> <b>Descripción Detallada del incidente:</b>
+    </p>
+    <p class="MsoNormal" style="margin-bottom:0cm;margin-top:5pt">
+      {{ descripcion }}
+    </p>
+  </td>
+</tr>
+
+<tr style="height:13.55pt">
+  <td width="174" colspan="7" valign="top" style="width:130.5pt;border:solid windowtext 1.0pt;border-top:none;padding:0cm 5.4pt 0cm 5.4pt;height:13.55pt">
+    <p class="MsoNormal" style="margin-bottom:0cm"><b>SOFTWARE</b></p>
+  </td>
+  <td width="67" colspan="3" valign="top" style="width:50.25pt;border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;padding:0cm 5.4pt 0cm 5.4pt;height:13.55pt">
+    <p class="MsoNormal" align="center" style="text-align:center;margin-bottom:0cm"><b>{% if tipo_incidente and 'SOFTWARE' in tipo_incidente.upper() %}X{% endif %}</b></p>
+  </td>
+</tr>
+
+<tr style="height:15.9pt">
+  <td width="174" colspan="7" valign="top" style="width:130.5pt;border:solid windowtext 1.0pt;border-top:none;padding:0cm 5.4pt 0cm 5.4pt;height:15.9pt">
+    <p class="MsoNormal" style="margin-bottom:0cm"><b>HARDWARE</b></p>
+  </td>
+  <td width="67" colspan="3" valign="top" style="width:50.25pt;border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;padding:0cm 5.4pt 0cm 5.4pt;height:15.9pt">
+    <p class="MsoNormal" align="center" style="text-align:center;margin-bottom:0cm"><b>{% if tipo_incidente and 'HARDWARE' in tipo_incidente.upper() %}X{% endif %}</b></p>
+  </td>
+</tr>
+
+<tr style="height:95.5pt">
+  <td width="241" colspan="10" valign="top" style="width:180.75pt;border:solid windowtext 1.0pt;border-top:none;padding:0cm 5.4pt 0cm 5.4pt;height:95.5pt">
+    <p class="MsoNormal" style="margin-bottom:0cm"><b>OTRO:</b></p>
+    <p class="MsoNormal" style="margin-bottom:0cm;margin-top:5pt">{% if tipo_incidente and tipo_incidente.upper() == 'OTRO' %}X - {{ tipo_incidente_otro }}{% endif %}</p>
+  </td>
+</tr>
+
+
+
+
+
+ <!-- SECCIÓN 3: DATOS DEL PERSONAL ASIGNADO -->
+ <tr style="height:24.8pt">
+  <td width="61" colspan="2" valign="top" style="width:45.95pt;border:solid windowtext 1.0pt;border-top:none;padding:0cm 5.4pt 0cm 5.4pt;height:24.8pt">
+    <p class="MsoNormal" style="margin-bottom:0cm"><b>3</b></p>
+  </td>
+  <td width="670" colspan="22" valign="top" style="width:502.15pt;border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;padding:0cm 5.4pt 0cm 5.4pt;height:24.8pt">
+    <p class="MsoNormal" align="center" style="margin-bottom:0cm;text-align:center"><b>DATOS DEL PERSONAL ASIGNADO</b></p>
+  </td>
+ </tr>
+
+ <!-- PERSONAL ASIGNADO -->
+ <tr style="height:3.0pt">
+  <td width="241" colspan="10" valign="top" style="width:180.75pt;border:solid windowtext 1.0pt;border-top:none;padding:0cm 5.4pt 0cm 5.4pt;height:3.0pt">
+    <p class="MsoNormal" style="margin-bottom:0cm"><b>PERSONAL ASIGNADO</b></p>
+  </td>
+  <td width="490" colspan="14" valign="top" style="width:367.35pt;border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;padding:0cm 5.4pt 0cm 5.4pt;height:3.0pt">
+    <p class="MsoNormal" style="margin-bottom:0cm">{{ personal_asignado or 'Sin asignar' }}</p>
+  </td>
+ </tr>
+
+
+ <!-- PRIORIDAD -->
+<tr style="height:12.1pt">
+  <td width="241" colspan="10" valign="top" style="width:180.75pt;border:solid windowtext 1.0pt;border-top:none;padding:0cm 5.4pt 0cm 5.4pt;height:12.1pt">
+    <p class="MsoNormal" style="margin-bottom:0cm"><b>PRIORIDAD</b></p>
+  </td>
+  <td width="77" colspan="3" valign="top" style="width:57.75pt;border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;padding:0cm 5.4pt 0cm 5.4pt;height:12.1pt">
+    <p class="MsoNormal" style="margin-bottom:0cm">BAJA</p>
+  </td>
+  <td width="48" colspan="3" valign="top" style="width:35.75pt;border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;padding:0cm 5.4pt 0cm 5.4pt;height:12.1pt">
+    <p class="MsoNormal" align="center" style="text-align:center;margin-bottom:0cm"><b>{% if prioridad and prioridad.upper() == 'BAJA' %}X{% endif %}</b></p>
+  </td>
+  <td width="142" colspan="2" valign="top" style="width:106.35pt;border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;padding:0cm 5.4pt 0cm 5.4pt;height:12.1pt">
+    <p class="MsoNormal" align="center" style="text-align:center;margin-bottom:0cm">MEDIA</p>
+  </td>
+  <td width="47" colspan="2" valign="top" style="width:35.4pt;border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;padding:0cm 5.4pt 0cm 5.4pt;height:12.1pt">
+    <p class="MsoNormal" align="center" style="text-align:center;margin-bottom:0cm"><b>{% if prioridad and prioridad.upper() == 'MEDIA' %}X{% endif %}</b></p>
+  </td>
+  <td width="127" colspan="3" valign="top" style="width:95.4pt;border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;padding:0cm 5.4pt 0cm 5.4pt;height:12.1pt">
+    <p class="MsoNormal" style="margin-bottom:0cm">ALTA</p>
+  </td>
+  <td width="49" valign="top" style="width:36.7pt;border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;padding:0cm 5.4pt 0cm 5.4pt;height:12.1pt">
+    <p class="MsoNormal" align="center" style="text-align:center;margin-bottom:0cm"><b>{% if prioridad and prioridad.upper() == 'ALTA' %}X{% endif %}</b></p>
+  </td>
+</tr>
+
+
+
+ 
+ <!-- SECCIÓN 4: DATOS DE RESOLUCIÓN -->
+ <tr style="height:19.2pt">
+  <td width="60" valign="top" style="width:45.2pt;border:solid windowtext 1.0pt;border-top:none;padding:0cm 5.4pt 0cm 5.4pt;height:19.2pt">
+    <p class="MsoNormal" style="margin-bottom:0cm"><b>4</b></p>
+  </td>
+  <td width="671" colspan="23" valign="top" style="width:502.9pt;border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;padding:0cm 5.4pt 0cm 5.4pt;height:19.2pt">
+    <p class="MsoNormal" style="margin-bottom:0cm"><b>DATOS DE RESOLUCIÓN</b></p>
+  </td>
+ </tr>
+
+ <!-- DETALLE DE ACTIVIDAD Y COMENTARIOS -->
+ <tr style="height:103.95pt">
+  <td width="329" colspan="14" rowspan="2" valign="top" style="width:246.45pt;border:solid windowtext 1.0pt;border-top:none;padding:0cm 5.4pt 0cm 5.4pt;height:103.95pt">
+    <p class="MsoListParagraph" style="margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:13.15pt;text-indent:-13.15pt">
+      <span style="font-family:Wingdings">▶</span> <b>Detalle de actividad realizada para solución del incidente:</b>
+    </p>
+    <p class="MsoNormal" style="margin-bottom:0cm;margin-top:5pt">
+      {{ detalle_solucion }}
+    </p>
+  </td>
+  <td width="402" colspan="10" valign="top" style="width:301.65pt;border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;padding:0cm 5.4pt 0cm 5.4pt;height:103.95pt">
+    <p class="MsoListParagraph" style="margin-top:0cm;margin-right:0cm;margin-bottom:0cm;margin-left:15.5pt;text-indent:-15.5pt">
+      <span style="font-size:10.0pt;line-height:115%;font-family:Wingdings">▶</span>
+      <span style="font-size:10.0pt;line-height:115%"> <b>Comentarios y observaciones del incidente:</b></span>
+    </p>
+    <p class="MsoNormal" style="margin-bottom:0cm;margin-top:5pt">
+      {{ observaciones }}
+    </p>
+  </td>
+ </tr>
+
+ <!-- FIRMA Y CELULAR -->
+ <tr style="height:126.7pt">
+  <td width="402" colspan="10" valign="top" style="width:301.65pt;border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;padding:0cm 5.4pt 0cm 5.4pt;height:126.7pt">
+    <p class="MsoNormal" style="margin-bottom:0cm">&nbsp;</p>
+    <p class="MsoNormal" style="margin-bottom:0cm">&nbsp;</p>
+    <p class="MsoNormal" style="margin-bottom:0cm">&nbsp;</p>
+    <p class="MsoNormal" align="center" style="text-align:center;line-height:normal">
+      <span style="font-size:10.0pt">.......................................................</span>
+    </p>
+    <p class="MsoNormal" align="center" style="text-align:center;line-height:normal">
+      <span style="font-size:10.0pt">Firma del usuario</span>
+    </p>
+    <p class="MsoNormal" align="center" style="text-align:center;line-height:normal">
+      <span style="font-size:10.0pt">&nbsp;</span>
+    </p>
+    <p class="MsoNormal" align="center" style="text-align:center">
+      <span style="font-size:10.0pt;line-height:115%">Celular: {{ celular_encargado }}</span>
+    </p>
+  </td>
+ </tr>
+
+</table>
+
+<p class="MsoNormal">&nbsp;</p>
+
+</div>
+</body>
+
+
+
+
+</html>

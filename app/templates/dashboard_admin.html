@@ -1,0 +1,248 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard Administrador{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<div class="mb-8">
+    <h1 class="text-3xl font-bold text-base-content mb-2 flex items-center gap-3">
+        <div class="p-3 bg-primary/10 rounded-lg">
+            <i class="mdi mdi-view-dashboard text-2xl text-primary"></i>
+        </div>
+        Dashboard
+    </h1>
+    <p class="text-base-content/60">Resumen general del sistema</p>
+</div>
+
+<!-- Stats Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+    <!-- Total Incidentes -->
+    <div class="card bg-gradient-to-br from-blue-50 to-blue-100 shadow border-l-4 border-blue-500">
+        <div class="card-body">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-semibold opacity-70">Total Incidentes</p>
+                    <p class="text-3xl font-bold text-blue-600">{{ total_incidentes }}</p>
+                </div>
+                <div class="text-5xl opacity-20">
+                    <i class="mdi mdi-clipboard-list-outline"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Prioridad Alta -->
+    <div class="card bg-gradient-to-br from-red-50 to-red-100 shadow border-l-4 border-red-500">
+        <div class="card-body">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-semibold opacity-70">Prioridad Alta</p>
+                    <p class="text-3xl font-bold text-red-600">{{ prioridad_alta }}</p>
+                </div>
+                <div class="text-5xl opacity-20">
+                    <i class="mdi mdi-alert-circle"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Prioridad Media -->
+    <div class="card bg-gradient-to-br from-amber-50 to-amber-100 shadow border-l-4 border-amber-500">
+        <div class="card-body">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-semibold opacity-70">Prioridad Media</p>
+                    <p class="text-3xl font-bold text-amber-600">{{ prioridad_media }}</p>
+                </div>
+                <div class="text-5xl opacity-20">
+                    <i class="mdi mdi-alert-outline"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Prioridad Baja -->
+    <div class="card bg-gradient-to-br from-green-50 to-green-100 shadow border-l-4 border-green-500">
+        <div class="card-body">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-semibold opacity-70">Prioridad Baja</p>
+                    <p class="text-3xl font-bold text-green-600">{{ prioridad_baja }}</p>
+                </div>
+                <div class="text-5xl opacity-20">
+                    <i class="mdi mdi-check-circle-outline"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Total Practicantes -->
+    <div class="card bg-gradient-to-br from-cyan-50 to-cyan-100 shadow border-l-4 border-cyan-500">
+        <div class="card-body">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-semibold opacity-70">Total Practicantes</p>
+                    <p class="text-3xl font-bold text-cyan-600">{{ total_practicantes }}</p>
+                </div>
+                <div class="text-5xl opacity-20">
+                    <i class="mdi mdi-account-school-outline"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resueltos Hoy -->
+    <div class="card bg-gradient-to-br from-teal-50 to-teal-100 shadow border-l-4 border-teal-500">
+        <div class="card-body">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-semibold opacity-70">Resueltos Hoy</p>
+                    <p class="text-3xl font-bold text-teal-600">{{ resueltos_hoy }}</p>
+                </div>
+                <div class="text-5xl opacity-20">
+                    <i class="mdi mdi-chart-line-variant"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+    <div class="card bg-base-100 shadow-lg border border-base-300">
+        <div class="card-body">
+            <h3 class="card-title text-lg mb-4 flex items-center gap-2">
+                <i class="mdi mdi-chart-bar text-primary"></i> Incidentes por Prioridad
+            </h3>
+            <canvas id="chartPrioridad"></canvas>
+        </div>
+    </div>
+
+    <div class="card bg-base-100 shadow-lg border border-base-300">
+        <div class="card-body">
+            <h3 class="card-title text-lg mb-4 flex items-center gap-2">
+                <i class="mdi mdi-doughnut text-primary"></i> Incidentes por Tipo
+            </h3>
+            <canvas id="chartTipo"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- Practicantes List -->
+<div class="card bg-base-100 shadow-lg border border-base-300 mb-8">
+    <div class="card-body">
+        <h3 class="card-title text-lg mb-6 flex items-center gap-2">
+            <i class="mdi mdi-chart-line text-primary"></i> Incidentes por Practicante
+        </h3>
+        <div class="space-y-4">
+            {% if incidentes_por_practicante and incidentes_por_practicante|length > 0 %}
+                {% set max_total = incidentes_por_practicante | map(attribute='total') | max %}
+                {% for item in incidentes_por_practicante %}
+                <div class="flex items-center gap-4">
+                    <div class="w-40 flex items-center gap-2">
+                        <i class="mdi mdi-account-circle text-lg text-primary"></i>
+                        <span class="font-medium text-sm">{{ item.nombre }}</span>
+                    </div>
+                    <div class="flex-1">
+                        <div class="w-full bg-base-300 rounded-full h-3 overflow-hidden">
+                            <div class="bg-gradient-to-r from-primary to-secondary h-3 rounded-full transition-all duration-500"
+                                 style="width: {{ (item.total / max_total * 100) if max_total > 0 else 0 }}%"></div>
+                        </div>
+                    </div>
+                    <div class="w-16 text-right font-bold text-primary">{{ item.total }}</div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="text-center py-12 opacity-60">
+                    <i class="mdi mdi-inbox-multiple-outline text-5xl mb-2 block opacity-30"></i>
+                    <p>No hay incidentes asignados a practicantes aún.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Últimos Incidentes Table -->
+<div class="card bg-base-100 shadow-lg border border-base-300">
+    <div class="card-body">
+        <h3 class="card-title text-lg mb-4 flex items-center gap-2">
+            <i class="mdi mdi-clock-outline text-primary"></i> Últimos 10 Incidentes
+        </h3>
+        <div class="overflow-x-auto">
+            <table class="table table-sm w-full">
+                <thead class="bg-base-200">
+                    <tr>
+                        <th><i class="mdi mdi-hashtag"></i> ID</th>
+                        <th><i class="mdi mdi-calendar-outline"></i> Fecha</th>
+                        <th><i class="mdi mdi-account-outline"></i> Usuario</th>
+                        <th><i class="mdi mdi-text-box-outline"></i> Descripción</th>
+                        <th><i class="mdi mdi-alert-outline"></i> Prioridad</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if ultimos_incidentes %}
+                        {% for inc in ultimos_incidentes %}
+                        <tr class="hover:bg-base-200 transition">
+                            <td class="font-bold text-primary">#{{ inc.id }}</td>
+                            <td>{{ inc.fecha_incidente.strftime('%d/%m/%Y') }}</td>
+                            <td>{{ inc.nombre_usuario }}</td>
+                            <td class="max-w-xs truncate">{{ inc.descripcion[:50] }}...</td>
+                            <td>
+                                <span class="badge {% if inc.prioridad.upper() == 'ALTA' %}badge-error{% elif inc.prioridad.upper() == 'MEDIA' %}badge-warning{% else %}badge-success{% endif %}">
+                                    {{ inc.prioridad }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center py-12 opacity-60">
+                                <i class="mdi mdi-information-outline"></i> No hay incidentes registrados
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Gráfico de Prioridad
+    const ctxPrioridad = document.getElementById('chartPrioridad').getContext('2d');
+    new Chart(ctxPrioridad, {
+        type: 'bar',
+        data: {
+            labels: ['Alta', 'Media', 'Baja'],
+            datasets: [{
+                label: 'Incidentes',
+                data: [{{ prioridad_alta }}, {{ prioridad_media }}, {{ prioridad_baja }}],
+                backgroundColor: ['#ef4444', '#f59e0b', '#10b981'],
+                borderRadius: 8,
+                borderSkipped: false
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true } }
+        }
+    });
+
+    // Gráfico de Tipo
+    const ctxTipo = document.getElementById('chartTipo').getContext('2d');
+    new Chart(ctxTipo, {
+        type: 'doughnut',
+        data: {
+            labels: [{% for tipo, count in incidentes_por_tipo %}'{{ tipo }}',{% endfor %}],
+            datasets: [{
+                data: [{% for tipo, count in incidentes_por_tipo %}{{ count }},{% endfor %}],
+                backgroundColor: ['#2563eb', '#9c27b0', '#ff9800', '#607d8b', '#10b981', '#ff5722']
+            }]
+        },
+        options: { responsive: true }
+    });
+</script>
+{% endblock %}

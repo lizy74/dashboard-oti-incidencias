@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block title %}Reportes{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<div class="mb-8">
+    <h1 class="text-3xl font-bold text-base-content mb-2 flex items-center gap-3">
+        <div class="p-3 bg-accent/10 rounded-lg">
+            <i class="mdi mdi-chart-box-outline text-2xl text-accent"></i>
+        </div>
+        Reportes Avanzados
+    </h1>
+    <p class="text-base-content/60">Genera reportes personalizados del sistema</p>
+</div>
+
+{% if es_admin %}
+<!-- Filters Card -->
+<div class="card bg-base-100 shadow-lg border border-base-300">
+    <div class="card-body">
+        <h3 class="card-title text-lg mb-6 flex items-center gap-2">
+            <i class="mdi mdi-filter-outline text-primary"></i> Filtros de Búsqueda
+        </h3>
+
+        <form method="POST" action="{{ url_for('reportes.generar') }}" class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Tipo de Reporte -->
+                <div class="form-control w-full">
+                    <label class="label">
+                        <span class="label-text font-semibold">Tipo de Reporte</span>
+                    </label>
+                    <select name="tipo_reporte" class="select select-bordered focus:select-primary">
+                        <option value="general">Reporte General</option>
+                        <option value="fecha">Por Fecha</option>
+                        <option value="practicante">Por Practicante</option>
+                        <option value="prioridad">Por Prioridad</option>
+                        <option value="sede">Por Sede</option>
+                    </select>
+                </div>
+
+                <!-- Fecha Inicio -->
+                <div class="form-control w-full">
+                    <label class="label">
+                        <span class="label-text font-semibold">Fecha Inicio</span>
+                    </label>
+                    <input type="date" name="fecha_inicio" class="input input-bordered focus:input-primary">
+                </div>
+
+                <!-- Fecha Fin -->
+                <div class="form-control w-full">
+                    <label class="label">
+                        <span class="label-text font-semibold">Fecha Fin</span>
+                    </label>
+                    <input type="date" name="fecha_fin" class="input input-bordered focus:input-primary">
+                </div>
+
+                <!-- Practicante -->
+                <div class="form-control w-full">
+                    <label class="label">
+                        <span class="label-text font-semibold">Practicante</span>
+                    </label>
+                    <select name="practicante_id" class="select select-bordered focus:select-primary">
+                        <option value="">Todos</option>
+                        {% for p in practicantes %}
+                        <option value="{{ p.id }}">{{ p.nombre_completo }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Prioridad -->
+                <div class="form-control w-full">
+                    <label class="label">
+                        <span class="label-text font-semibold">Prioridad</span>
+                    </label>
+                    <select name="prioridad" class="select select-bordered focus:select-primary">
+                        <option value="">Todas</option>
+                        {% for prior in prioridades %}
+                        <option value="{{ prior }}">{{ prior }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Sede -->
+                <div class="form-control w-full">
+                    <label class="label">
+                        <span class="label-text font-semibold">Sede</span>
+                    </label>
+                    <select name="sede" class="select select-bordered focus:select-primary">
+                        <option value="">Todas</option>
+                        {% for s in sedes %}
+                        <option value="{{ s }}">{{ s }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="flex gap-2 pt-4">
+                <button type="submit" class="btn btn-primary gap-2">
+                    <i class="mdi mdi-file-excel-outline"></i> Generar Reporte (Excel)
+                </button>
+                <a href="{{ url_for('reportes.index') }}" class="btn btn-outline gap-2">
+                    <i class="mdi mdi-refresh"></i> Limpiar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
+{% else %}
+
+{% endif %}
+{% endblock %}

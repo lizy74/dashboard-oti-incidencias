@@ -1,0 +1,265 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Incidente #{{ incidente.id }}{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<div class="mb-8">
+    <h1 class="text-3xl font-bold text-base-content mb-2 flex items-center gap-3">
+        <div class="p-3 bg-warning/10 rounded-lg">
+            <i class="mdi mdi-pencil-outline text-2xl text-warning"></i>
+        </div>
+        Editar Incidente #{{ incidente.id }}
+    </h1>
+    <p class="text-base-content/60">Modifica los detalles del incidente</p>
+</div>
+
+<!-- Alert if can't edit personal -->
+{% if not puede_editar_personal %}
+<div class="alert alert-info mb-6">
+    <i class="mdi mdi-information-outline text-lg"></i>
+    <span>
+        <strong>Nota:</strong> Como practicante, no puedes modificar el personal asignado a este incidente.
+    </span>
+</div>
+{% endif %}
+
+<form method="POST" class="space-y-6">
+    <!-- Información Temporal -->
+    <div class="card bg-base-100 shadow-lg border border-base-300">
+        <div class="card-body">
+            <h3 class="card-title text-lg mb-6 flex items-center gap-2">
+                <i class="mdi mdi-calendar-clock text-primary"></i> Información Temporal
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="form-control w-full">
+                    <label class="label">
+                        <span class="label-text font-semibold">Fecha del Incidente *</span>
+                    </label>
+                    <input type="date" 
+                           name="fecha_incidente" 
+                           value="{{ incidente.fecha_incidente }}" 
+                           class="input input-bordered focus:input-primary"
+                           required>
+                </div>
+                <div class="form-control w-full">
+                    <label class="label">
+                        <span class="label-text font-semibold">Hora *</span>
+                    </label>
+                    <input type="time" 
+                           name="hora" 
+                           value="{{ incidente.hora.strftime('%H:%M') }}" 
+                           class="input input-bordered focus:input-primary"
+                           required>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Datos del Usuario -->
+    <div class="card bg-base-100 shadow-lg border border-base-300">
+        <div class="card-body">
+            <h3 class="card-title text-lg mb-6 flex items-center gap-2">
+                <i class="mdi mdi-account-outline text-secondary"></i> Datos del Usuario
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="form-control w-full">
+                    <label class="label">
+                        <span class="label-text font-semibold">Código del Trabajador</span>
+                    </label>
+                    <input type="text" 
+                           name="codigo_trabajador" 
+                           value="{{ incidente.codigo_trabajador or '' }}"
+                           class="input input-bordered focus:input-primary"
+                           placeholder="Código">
+                </div>
+                <div class="form-control w-full">
+                    <label class="label">
+                        <span class="label-text font-semibold">DNI *</span>
+                    </label>
+                    <input type="text" 
+                           name="dni" 
+                           value="{{ incidente.dni }}" 
+                           class="input input-bordered focus:input-primary"
+                           required 
+                           maxlength="8"
+                           placeholder="12345678">
+                </div>
+                <div class="form-control w-full md:col-span-2">
+                    <label class="label">
+                        <span class="label-text font-semibold">Nombre de Usuario *</span>
+                    </label>
+                    <input type="text" 
+                           name="nombre_usuario" 
+                           value="{{ incidente.nombre_usuario }}" 
+                           class="input input-bordered focus:input-primary"
+                           required
+                           placeholder="Nombre completo">
+                </div>
+                <div class="form-control w-full">
+                    <label class="label">
+                        <span class="label-text font-semibold">Celular del Encargado</span>
+                    </label>
+                    <input type="text" 
+                           name="celular_encargado" 
+                           value="{{ incidente.celular_encargado or '' }}"
+                           class="input input-bordered focus:input-primary"
+                           maxlength="9"
+                           placeholder="987654321">
+                </div>
+                <div class="form-control w-full">
+                    <label class="label">
+                        <span class="label-text font-semibold">Oficina</span>
+                    </label>
+                    <input type="text" 
+                           name="oficina" 
+                           value="{{ incidente.oficina or '' }}"
+                           class="input input-bordered focus:input-primary"
+                           placeholder="Nombre de la oficina">
+                </div>
+                <div class="form-control w-full">
+                    <label class="label">
+                        <span class="label-text font-semibold">Sede *</span>
+                    </label>
+                    <select name="sede" class="select select-bordered focus:select-primary" required>
+                        {% for s in sedes %}
+                        <option value="{{ s }}" {% if incidente.sede == s %}selected{% endif %}>{{ s }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Información del Incidente -->
+    <div class="card bg-base-100 shadow-lg border border-base-300">
+        <div class="card-body">
+            <h3 class="card-title text-lg mb-6 flex items-center gap-2">
+                <i class="mdi mdi-alert-outline text-accent"></i> Información del Incidente
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="form-control w-full">
+                    <label class="label">
+                        <span class="label-text font-semibold">Tipo de Incidente *</span>
+                    </label>
+                    <select name="tipo_incidente" 
+                            id="tipo_incidente" 
+                            class="select select-bordered focus:select-primary"
+                            onchange="toggleOtro()"
+                            required>
+                        {% for t in tipos_incidente %}
+                        <option value="{{ t }}" {% if incidente.tipo_incidente == t %}selected{% endif %}>{{ t }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-control w-full" id="otroTipo" style="display:{% if incidente.tipo_incidente == 'Otro' %}block{% else %}none{% endif %};">
+                    <label class="label">
+                        <span class="label-text font-semibold">Especifique el tipo</span>
+                    </label>
+                    <input type="text" 
+                           name="tipo_incidente_otro" 
+                           value="{{ incidente.tipo_incidente_otro or '' }}"
+                           class="input input-bordered focus:input-primary"
+                           placeholder="Otros tipos">
+                </div>
+                <div class="form-control w-full">
+                    <label class="label">
+                        <span class="label-text font-semibold">Prioridad *</span>
+                    </label>
+                    <select name="prioridad" class="select select-bordered focus:select-primary" required>
+                        {% for p in prioridades %}
+                        <option value="{{ p }}" {% if incidente.prioridad == p %}selected{% endif %}>{{ p }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-control w-full mt-6">
+                <label class="label">
+                    <span class="label-text font-semibold">Descripción del Incidente *</span>
+                </label>
+                <textarea name="descripcion" 
+                          class="textarea textarea-bordered h-32 focus:textarea-primary"
+                          required
+                          placeholder="Describe el incidente en detalle...">{{ incidente.descripcion }}</textarea>
+            </div>
+        </div>
+    </div>
+
+    <!-- Asignación de Personal (solo si puede editar) -->
+{% if puede_editar_personal %}
+<div class="card bg-base-100 shadow-lg border border-base-300">
+    <div class="card-body">
+        <h3 class="card-title text-lg mb-6 flex items-center gap-2">
+            <i class="mdi mdi-account-multiple-plus text-success"></i> Asignación de Personal
+        </h3>
+        <p class="text-sm opacity-70 mb-4">Puedes seleccionar varios practicantes</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+            {% for p in practicantes %}
+            <label class="label cursor-pointer justify-between gap-3 px-4 py-2 border border-base-300 rounded-lg hover:bg-base-200 transition">
+                <span class="label-text flex items-center gap-2">
+                    <i class="mdi mdi-account"></i> {{ p.nombre_completo }}
+                </span>
+                <input type="checkbox" 
+                       name="personal_asignado" 
+                       value="{{ p.id }}"
+                       class="checkbox checkbox-sm"
+                       {% if p.id in practicantes_asignados %}checked{% endif %}>
+            </label>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endif %}
+
+
+
+
+    <!-- Solución -->
+    <div class="card bg-base-100 shadow-lg border border-base-300">
+        <div class="card-body">
+            <h3 class="card-title text-lg mb-6 flex items-center gap-2">
+                <i class="mdi mdi-check-all text-success"></i> Solución
+            </h3>
+            <div class="space-y-6">
+                <div class="form-control w-full">
+                    <label class="label">
+                        <span class="label-text font-semibold">Detalle de Solución</span>
+                    </label>
+                    <textarea name="detalle_solucion" 
+                              class="textarea textarea-bordered h-24 focus:textarea-primary"
+                              placeholder="Describe la solución aplicada...">{{ incidente.detalle_solucion or '' }}</textarea>
+                </div>
+                <div class="form-control w-full">
+                    <label class="label">
+                        <span class="label-text font-semibold">Observaciones y Comentarios</span>
+                    </label>
+                    <textarea name="observaciones" 
+                              class="textarea textarea-bordered h-20 focus:textarea-primary"
+                              placeholder="Observaciones adicionales...">{{ incidente.observaciones or '' }}</textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="card-actions gap-3 pt-6">
+        <button type="submit" class="btn btn-primary gap-2">
+            <i class="mdi mdi-content-save"></i> Guardar Cambios
+        </button>
+        <a href="{{ url_for('incidentes.detalle', id=incidente.id) }}" class="btn btn-outline gap-2">
+            <i class="mdi mdi-close-circle-outline"></i> Cancelar
+        </a>
+    </div>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function toggleOtro() {
+        const select = document.getElementById('tipo_incidente');
+        const otroDiv = document.getElementById('otroTipo');
+        otroDiv.style.display = select.value === 'Otro' ? 'block' : 'none';
+    }
+</script>
+{% endblock %}

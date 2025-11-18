@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}SISTEMA DE REGISTRO DE INCIDENCIAS{% endblock %}</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- DaisyUI -->
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@3.9.4/dist/full.css" rel="stylesheet" type="text/css" />
+    
+    <!-- Material Design Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        /* Desactivar scroll elástico (rubber band scrolling) */
+        html, body {
+            overscroll-behavior: none;
+        }
+        
+        body {
+            overscroll-behavior: none;
+        }
+        
+        main {
+            overscroll-behavior: none;
+        }
+        
+        /* Evitar el efecto en todos los elementos */
+        * {
+            overscroll-behavior: none;
+        }
+    </style>
+</head>
+
+<body class="bg-base-100 overscroll-none">
+    {% if current_user.is_authenticated %}
+    
+    <!-- DRAWER LAYOUT -->
+<div class="drawer lg:drawer-open">
+    <input id="my-drawer-2" type="checkbox" class="drawer-toggle" />
+    
+    <!-- MAIN CONTENT -->
+    <div class="drawer-content flex flex-col">
+        <!-- TOPBAR -->
+        <div class="navbar bg-base-100 border-b border-base-300 sticky top-0 z-40 shadow-sm">
+            <div class="flex-1">
+                <!-- BOTÓN HAMBURGUESA - SOLO EN MÓVIL -->
+                <label for="my-drawer-2" class="btn btn-ghost drawer-button lg:hidden rounded-lg">
+                    <i class="mdi mdi-menu text-xl"></i>
+                </label>
+                <h1 class="text-lg lg:text-xl font-bold text-primary ml-2 lg:ml-0 flex items-center gap-2">
+                    <i class="mdi mdi-clipboard-list-outline text-2xl"></i>
+                    <span class="hidden sm:inline">SISTEMA DE INCIDENCIAS SURC-OTI</span>
+                </h1>
+            </div>
+    
+    <div class="flex-none gap-2 lg:gap-3">
+        
+        <!-- User Dropdown -->
+        <div class="dropdown dropdown-end">
+            <button tabindex="0" class="btn btn-ghost btn-circle avatar">
+                <div class="w-10 rounded-full bg-gradient-to-br from-primary to-secondary text-white flex items-center justify-center font-bold text-sm">
+                    {{ current_user.nombre_completo[0].upper() }}
+                </div>
+            </button>
+            <ul tabindex="0" class="dropdown-content z-[1] menu p-3 shadow bg-base-100 rounded-box w-64 border border-base-300">
+                <!-- User Info Header -->
+                <li class="menu-title mb-3 pb-3 border-b border-base-300">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-secondary text-white flex items-center justify-center font-bold">
+                            {{ current_user.nombre_completo[0].upper() }}
+                        </div>
+                        <div>
+                            <p class="font-semibold text-base">{{ current_user.nombre_completo }}</p>
+                            <p class="text-xs opacity-70">{{ current_user.email }}</p>
+                        </div>
+                    </div>
+                </li>
+                
+                <!-- Menu Items -->
+                <li><a href="{{ url_for('auth.cambiar_password') }}" class="gap-2 py-2">
+                    <i class="mdi mdi-lock-reset"></i> Cambiar Contraseña
+                </a></li>
+                
+                <li class="border-t border-base-300 my-2"></li>
+                
+                <li><a href="{{ url_for('auth.logout') }}" class="gap-2 py-2 text-error hover:bg-error/10">
+                    <i class="mdi mdi-logout-variant"></i> Cerrar Sesión
+                </a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+            
+
+
+
+            <!-- PAGE CONTENT -->
+            <main class="flex-1 p-4 lg:p-6 overflow-auto">
+                <!-- Alerts -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                {% for category, message in messages %}
+                <div class="alert alert-{{ 'success' if category == 'success' else 'error' if category == 'error' else 'warning' if category == 'warning' else 'info' }} mb-4 shadow-lg">
+                    <i class="mdi mdi-alert-circle-outline text-lg"></i>
+                    <span>{{ message }}</span>
+                    <button onclick="this.parentElement.remove()" class="btn btn-sm btn-ghost">
+                        <i class="mdi mdi-close"></i>
+                    </button>
+                </div>
+                {% endfor %}
+                {% endif %}
+                {% endwith %}
+                
+                <!-- Page Content -->
+                <div class="max-w-7xl mx-auto">
+                    {% block content %}{% endblock %}
+                </div>
+            </main>
+        </div>
+        
+
+
+        
+        <!-- SIDEBAR DRAWER -->
+        <div class="drawer-side">
+            <label for="my-drawer-2" aria-label="close sidebar" class="drawer-overlay"></label>
+            
+            <div class="menu p-4 w-64 min-h-full bg-base-200 text-base-content">
+                <!-- LOGO SECTION -->
+                <div class="mb-6 pb-4 border-b border-base-300">
+                    <div class="flex items-center gap-3 text-lg font-bold text-primary">
+                        
+                        <span>DASHBOARD</span>
+                    </div>
+                </div>
+                
+                <!-- MAIN MENU -->
+                <div class="space-y-2">
+                    <p class="text-xs font-bold opacity-50 uppercase tracking-wider px-3">Principal</p>
+                    <li>
+                        <a href="{{ url_for('dashboard.index') }}" 
+                           class="menu-link {% if request.endpoint == 'dashboard.index' %}active bg-primary text-primary-content{% endif %}"
+                           onclick="closeDrawer()">
+                            <i class="mdi mdi-view-dashboard-outline text-lg"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('incidentes.lista') }}"
+                           class="menu-link {% if request.endpoint == 'incidentes.lista' or request.endpoint == 'incidentes.detalle' or request.endpoint == 'incidentes.editar' %}active bg-primary text-primary-content{% endif %}"
+                           onclick="closeDrawer()">
+                            <i class="mdi mdi-folder-alert-outline text-lg"></i>
+                            <span>Incidentes</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('incidentes.nuevo') }}"
+                           class="menu-link {% if request.endpoint == 'incidentes.nuevo' %}active bg-primary text-primary-content{% endif %}"
+                           onclick="closeDrawer()">
+                            <i class="mdi mdi-plus-circle-outline text-lg"></i>
+                            <span>Nuevo Incidente</span>
+                        </a>
+                    </li>
+                </div>
+                
+                <!-- ADMIN MENU -->
+                {% if current_user.rol == 'admin' %}
+                <div class="space-y-2 mt-6 pt-6 border-t border-base-300">
+                    <p class="text-xs font-bold opacity-50 uppercase tracking-wider px-3">Administración</p>
+                    <li>
+                        <a href="{{ url_for('reportes.index') }}"
+                           class="menu-link {% if request.endpoint == 'reportes.index' %}active bg-primary text-primary-content{% endif %}"
+                           onclick="closeDrawer()">
+                            <i class="mdi mdi-chart-box-outline text-lg"></i>
+                            <span>Reportes</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('importar.index') }}"
+                           class="menu-link {% if request.endpoint == 'importar.index' %}active bg-primary text-primary-content{% endif %}"
+                           onclick="closeDrawer()">
+                            <i class="mdi mdi-database-import-outline text-lg"></i>
+                            <span>Importar</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('practicantes.lista') }}"
+                           class="menu-link {% if request.endpoint == 'practicantes.lista' %}active bg-primary text-primary-content{% endif %}"
+                           onclick="closeDrawer()">
+                            <i class="mdi mdi-account-school-outline text-lg"></i>
+                            <span>Practicantes</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('usuarios.lista') }}"
+                           class="menu-link {% if request.endpoint == 'usuarios.lista' %}active bg-primary text-primary-content{% endif %}"
+                           onclick="closeDrawer()">
+                            <i class="mdi mdi-account-cog-outline text-lg"></i>
+                            <span>Usuarios</span>
+                        </a>
+                    </li>
+                </div>
+                {% endif %}
+                
+    
+            </div>
+        </div>
+    </div>
+    
+    {% endif %}
+
+    <!-- Main JS -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+    <script>
+        // Cerrar drawer al hacer click
+        function closeDrawer() {
+            document.getElementById('my-drawer-2').checked = false;
+        }
+    </script>
+
+    {% block scripts %}{% endblock %}
+</body>
+
+</html>

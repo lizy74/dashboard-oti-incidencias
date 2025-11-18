@@ -1,0 +1,250 @@
+{% extends "base.html" %}
+
+{% block title %}Nuevo Incidente{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<div class="mb-8">
+    <h1 class="text-3xl font-bold text-base-content mb-2 flex items-center gap-3">
+        <div class="p-3 bg-success/10 rounded-lg">
+            <i class="mdi mdi-plus-circle-outline text-2xl text-success"></i>
+        </div>
+        Registrar Nuevo Incidente
+    </h1>
+    <p class="text-base-content/60">Completa todos los campos requeridos</p>
+</div>
+
+<form method="POST" class="space-y-6">
+    <!-- Información Temporal -->
+    <div class="card bg-base-100 shadow-lg border border-base-300">
+        <div class="card-body">
+            <h3 class="card-title text-lg mb-6 flex items-center gap-2">
+                <i class="mdi mdi-calendar-clock text-primary"></i> Información Temporal
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="form-control w-full">
+                    <label class="label">
+                        <span class="label-text font-semibold">Fecha del Incidente *</span>
+                    </label>
+                    <input type="date" 
+                           name="fecha_incidente" 
+                           class="input input-bordered focus:input-primary"
+                           required>
+                </div>
+                <div class="form-control w-full">
+                    <label class="label">
+                        <span class="label-text font-semibold">Hora *</span>
+                    </label>
+                    <input type="time" 
+                           name="hora" 
+                           class="input input-bordered focus:input-primary"
+                           required>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Datos del Usuario -->
+    <div class="card bg-base-100 shadow-lg border border-base-300">
+        <div class="card-body">
+            <h3 class="card-title text-lg mb-6 flex items-center gap-2">
+                <i class="mdi mdi-account-outline text-secondary"></i> Datos del Usuario
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="form-control w-full">
+                    <label class="label">
+                        <span class="label-text font-semibold">Código del Trabajador</span>
+                    </label>
+                    <input type="text" 
+                           name="codigo_trabajador" 
+                           class="input input-bordered focus:input-primary"
+                           placeholder="Ej: 1040101">
+                </div>
+                <div class="form-control w-full">
+                    <label class="label">
+                        <span class="label-text font-semibold">DNI *</span>
+                    </label>
+                    <input type="text" 
+                           name="dni" 
+                           class="input input-bordered focus:input-primary"
+                           required 
+                           maxlength="8"
+                           placeholder="12345678">
+                </div>
+                <div class="form-control w-full md:col-span-2">
+                    <label class="label">
+                        <span class="label-text font-semibold">Nombre de Usuario *</span>
+                    </label>
+                    <input type="text" 
+                           name="nombre_usuario" 
+                           class="input input-bordered focus:input-primary"
+                           required 
+                           placeholder="Nombre completo">
+                </div>
+                <div class="form-control w-full">
+                    <label class="label">
+                        <span class="label-text font-semibold">Celular del Encargado</span>
+                    </label>
+                    <input type="text" 
+                           name="celular_encargado" 
+                           class="input input-bordered focus:input-primary"
+                           maxlength="9"
+                           placeholder="987654321">
+                </div>
+                <div class="form-control w-full">
+                    <label class="label">
+                        <span class="label-text font-semibold">Oficina</span>
+                    </label>
+                    <input type="text" 
+                           name="oficina" 
+                           class="input input-bordered focus:input-primary"
+                           placeholder="Ej: Informática">
+                </div>
+                <div class="form-control w-full">
+                    <label class="label">
+                        <span class="label-text font-semibold">Sede *</span>
+                    </label>
+                    <select name="sede" class="select select-bordered focus:select-primary" required>
+                        <option value="">Seleccionar...</option>
+                        {% for s in sedes %}
+                        <option value="{{ s }}">{{ s }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Información del Incidente -->
+    <div class="card bg-base-100 shadow-lg border border-base-300">
+        <div class="card-body">
+            <h3 class="card-title text-lg mb-6 flex items-center gap-2">
+                <i class="mdi mdi-alert-outline text-accent"></i> Información del Incidente
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="form-control w-full">
+                    <label class="label">
+                        <span class="label-text font-semibold">Tipo de Incidente *</span>
+                    </label>
+                    <select name="tipo_incidente" 
+                            id="tipo_incidente" 
+                            class="select select-bordered focus:select-primary"
+                            onchange="toggleOtro()"
+                            required>
+                        <option value="">Seleccionar...</option>
+                        {% for t in tipos_incidente %}
+                        <option value="{{ t }}">{{ t }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-control w-full" id="otroTipo" style="display:none;">
+                    <label class="label">
+                        <span class="label-text font-semibold">Especifique el tipo</span>
+                    </label>
+                    <input type="text" 
+                           name="tipo_incidente_otro" 
+                           class="input input-bordered focus:input-primary"
+                           placeholder="Describa el tipo de incidente">
+                </div>
+                <div class="form-control w-full">
+                    <label class="label">
+                        <span class="label-text font-semibold">Prioridad *</span>
+                    </label>
+                    <select name="prioridad" class="select select-bordered focus:select-primary" required>
+                        <option value="">Seleccionar...</option>
+                        {% for p in prioridades %}
+                        <option value="{{ p }}">{{ p }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-control w-full mt-6">
+                <label class="label">
+                    <span class="label-text font-semibold">Descripción del Incidente *</span>
+                </label>
+                <textarea name="descripcion" 
+                          class="textarea textarea-bordered h-32 focus:textarea-primary"
+                          required
+                          placeholder="Describa detalladamente el incidente..."></textarea>
+            </div>
+        </div>
+    </div>
+
+<!-- Asignación de Personal -->
+<div class="card bg-base-100 shadow-lg border border-base-300">
+    <div class="card-body">
+        <h3 class="card-title text-lg mb-6 flex items-center gap-2">
+            <i class="mdi mdi-account-multiple-plus text-success"></i> Asignación de Personal
+        </h3>
+        <p class="text-sm opacity-70 mb-4">Puedes seleccionar varios practicantes</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+            {% for p in practicantes %}
+            <label class="label cursor-pointer justify-between gap-3 px-4 py-2 border border-base-300 rounded-lg hover:bg-base-200 transition">
+                <span class="label-text flex items-center gap-2">
+                    <i class="mdi mdi-account"></i> {{ p.nombre_completo }}
+                </span>
+                <input type="checkbox" 
+                       name="personal_asignado" 
+                       value="{{ p.id }}"
+                       class="checkbox checkbox-sm">
+            </label>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+
+
+
+
+    <!-- Solución -->
+    <div class="card bg-base-100 shadow-lg border border-base-300">
+        <div class="card-body">
+            <h3 class="card-title text-lg mb-6 flex items-center gap-2">
+                <i class="mdi mdi-check-all text-success"></i> Solución
+            </h3>
+            <div class="space-y-6">
+                <div class="form-control w-full">
+                    <label class="label">
+                        <span class="label-text font-semibold">Detalle de Solución</span>
+                    </label>
+                    <textarea name="detalle_solucion" 
+                              class="textarea textarea-bordered h-24 focus:textarea-primary"
+                              placeholder="Describe la solución aplicada..."></textarea>
+                </div>
+                <div class="form-control w-full">
+                    <label class="label">
+                        <span class="label-text font-semibold">Observaciones y Comentarios</span>
+                    </label>
+                    <textarea name="observaciones" 
+                              class="textarea textarea-bordered h-20 focus:textarea-primary"
+                              placeholder="Comentarios adicionales..."></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="card-actions gap-3 pt-6">
+        <button type="submit" class="btn btn-primary gap-2">
+            <i class="mdi mdi-content-save"></i> Guardar Incidente
+        </button>
+        <a href="{{ url_for('incidentes.lista') }}" class="btn btn-outline gap-2">
+            <i class="mdi mdi-close-circle-outline"></i> Cancelar
+        </a>
+    </div>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function toggleOtro() {
+        const select = document.getElementById('tipo_incidente');
+        const otroDiv = document.getElementById('otroTipo');
+        if (select && otroDiv) {
+            otroDiv.style.display = select.value === 'Otro' ? 'block' : 'none';
+        }
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block title %}Gestión de Usuarios{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<div class="mb-8">
+    <h1 class="text-3xl font-bold text-base-content mb-2 flex items-center gap-3">
+        <div class="p-3 bg-primary/10 rounded-lg">
+            <i class="mdi mdi-account-cog-outline text-2xl text-primary"></i>
+        </div>
+        Gestión de Usuarios
+    </h1>
+    <p class="text-base-content/60">Administra los usuarios del sistema</p>
+</div>
+
+<!-- Usuarios Table -->
+<div class="card bg-base-100 shadow-lg border border-base-300">
+    <div class="card-body">
+        <h3 class="card-title text-lg mb-6 flex items-center gap-2">
+            <i class="mdi mdi-account-multiple-outline"></i> Lista de Usuarios
+        </h3>
+
+        <div class="overflow-x-auto">
+            <table class="table table-sm">
+                <thead class="bg-base-200">
+                    <tr>
+                        <th><i class="mdi mdi-hashtag"></i> ID</th>
+                        <th><i class="mdi mdi-account-outline"></i> Usuario</th>
+                        <th><i class="mdi mdi-information-outline"></i> Nombre Completo</th>
+                        <th><i class="mdi mdi-email-outline"></i> Email</th>
+                        <th><i class="mdi mdi-shield-outline"></i> Rol</th>
+                        <th><i class="mdi mdi-toggle-switch-outline"></i> Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for u in usuarios %}
+                    <tr class="hover:bg-base-200 transition">
+                        <td class="font-mono text-sm">#{{ u.id }}</td>
+                        <td class="font-semibold">{{ u.username }}</td>
+                        <td>{{ u.nombre_completo }}</td>
+                        <td class="text-sm opacity-80">{{ u.email }}</td>
+                        <td>
+                            <span class="badge badge-lg badge-outline gap-2 px-4 text-xs">
+                                <i class="mdi {% if u.rol == 'admin' %}mdi-shield{% else %}mdi-account{% endif %}"></i>
+                                {{ u.rol|upper }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge {% if u.activo %}badge-success{% else %}badge-error{% endif %}">
+                                {{ 'Activo' if u.activo else 'Inactivo' }}
+                            </span>
+                        </td>
+                        <td>
+                            <button onclick="resetearPassword({{ u.id }}, '{{ u.username }}')" 
+                                    class="btn btn-sm btn-warning gap-1">
+                                <i class="mdi mdi-lock-reset"></i> Resetear
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            {% if not usuarios %}
+            <div class="text-center py-12 opacity-60">
+                <i class="mdi mdi-inbox-multiple-outline text-5xl mb-2 block opacity-30"></i>
+                <p class="text-sm">No hay usuarios registrados</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Modal Resetear Contraseña -->
+<dialog id="modalResetear" class="modal">
+    <div class="modal-box w-full max-w-md">
+        <button onclick="cerrarModalResetear()" class="btn btn-sm btn-ghost float-right">
+            <i class="mdi mdi-close"></i>
+        </button>
+        
+        <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
+            <i class="mdi mdi-lock-reset text-warning"></i> Resetear Contraseña
+        </h3>
+
+        <form id="formResetear" method="POST" class="space-y-4">
+            <p class="text-sm opacity-80">
+                Nueva contraseña para el usuario: <strong id="reset_username" class="text-primary"></strong>
+            </p>
+
+            <div class="form-control w-full">
+                <label class="label">
+                    <span class="label-text font-semibold">Nueva Contraseña *</span>
+                </label>
+                <input type="text" id="reset_password" name="nueva_password" 
+                       class="input input-bordered focus:input-primary"
+                       required>
+                <label class="label">
+                    <span class="label-text-alt text-xs opacity-70">
+                        <i class="mdi mdi-information-outline"></i> Mínimo 6 caracteres recomendado
+                    </span>
+                </label>
+            </div>
+
+            <!-- Actions -->
+            <div class="modal-action">
+                <button type="button" onclick="cerrarModalResetear()" class="btn btn-outline">
+                    Cancelar
+                </button>
+                <button type="submit" class="btn btn-warning gap-2">
+                    <i class="mdi mdi-content-save"></i> Resetear
+                </button>
+            </div>
+        </form>
+    </div>
+    <form method="dialog" class="modal-backdrop">
+        <button>close</button>
+    </form>
+</dialog>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function resetearPassword(id, username) {
+        document.getElementById('formResetear').action = '/usuarios/resetear-password/' + id;
+        document.getElementById('reset_username').textContent = username;
+        document.getElementById('reset_password').value = username;
+        document.getElementById('modalResetear').showModal();
+    }
+
+    function cerrarModalResetear() {
+        document.getElementById('modalResetear').close();
+    }
+</script>
+{% endblock %}
