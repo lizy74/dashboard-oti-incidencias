@@ -14,7 +14,8 @@
     <p class="text-base-content/60">Completa todos los campos requeridos</p>
 </div>
 
-<form method="POST" class="space-y-6">
+<form id="incidente-form" method="POST" class="space-y-6">
+    <input type="hidden" name="firma" id="firma-input">
     <!-- Información Temporal -->
     <div class="card bg-base-100 shadow-lg border border-base-300">
         <div class="card-body">
@@ -26,8 +27,8 @@
                     <label class="label">
                         <span class="label-text font-semibold">Fecha del Incidente *</span>
                     </label>
-                    <input type="date" 
-                           name="fecha_incidente" 
+                    <input type="date"
+                           name="fecha_incidente"
                            class="input input-bordered focus:input-primary"
                            required>
                 </div>
@@ -35,8 +36,8 @@
                     <label class="label">
                         <span class="label-text font-semibold">Hora *</span>
                     </label>
-                    <input type="time" 
-                           name="hora" 
+                    <input type="time"
+                           name="hora"
                            class="input input-bordered focus:input-primary"
                            required>
                 </div>
@@ -55,8 +56,8 @@
                     <label class="label">
                         <span class="label-text font-semibold">Código del Trabajador</span>
                     </label>
-                    <input type="text" 
-                           name="codigo_trabajador" 
+                    <input type="text"
+                           name="codigo_trabajador"
                            class="input input-bordered focus:input-primary"
                            placeholder="Ej: 1040101">
                 </div>
@@ -64,10 +65,10 @@
                     <label class="label">
                         <span class="label-text font-semibold">DNI *</span>
                     </label>
-                    <input type="text" 
-                           name="dni" 
+                    <input type="text"
+                           name="dni"
                            class="input input-bordered focus:input-primary"
-                           required 
+                           required
                            maxlength="8"
                            placeholder="12345678">
                 </div>
@@ -75,18 +76,18 @@
                     <label class="label">
                         <span class="label-text font-semibold">Nombre de Usuario *</span>
                     </label>
-                    <input type="text" 
-                           name="nombre_usuario" 
+                    <input type="text"
+                           name="nombre_usuario"
                            class="input input-bordered focus:input-primary"
-                           required 
+                           required
                            placeholder="Nombre completo">
                 </div>
                 <div class="form-control w-full">
                     <label class="label">
                         <span class="label-text font-semibold">Celular del Encargado</span>
                     </label>
-                    <input type="text" 
-                           name="celular_encargado" 
+                    <input type="text"
+                           name="celular_encargado"
                            class="input input-bordered focus:input-primary"
                            maxlength="9"
                            placeholder="987654321">
@@ -95,8 +96,8 @@
                     <label class="label">
                         <span class="label-text font-semibold">Oficina</span>
                     </label>
-                    <input type="text" 
-                           name="oficina" 
+                    <input type="text"
+                           name="oficina"
                            class="input input-bordered focus:input-primary"
                            placeholder="Ej: Informática">
                 </div>
@@ -126,8 +127,8 @@
                     <label class="label">
                         <span class="label-text font-semibold">Tipo de Incidente *</span>
                     </label>
-                    <select name="tipo_incidente" 
-                            id="tipo_incidente" 
+                    <select name="tipo_incidente"
+                            id="tipo_incidente"
                             class="select select-bordered focus:select-primary"
                             onchange="toggleOtro()"
                             required>
@@ -141,8 +142,8 @@
                     <label class="label">
                         <span class="label-text font-semibold">Especifique el tipo</span>
                     </label>
-                    <input type="text" 
-                           name="tipo_incidente_otro" 
+                    <input type="text"
+                           name="tipo_incidente_otro"
                            class="input input-bordered focus:input-primary"
                            placeholder="Describa el tipo de incidente">
                 </div>
@@ -158,12 +159,12 @@
                     </select>
                 </div>
             </div>
-            
+
             <div class="form-control w-full mt-6">
                 <label class="label">
                     <span class="label-text font-semibold">Descripción del Incidente *</span>
                 </label>
-                <textarea name="descripcion" 
+                <textarea name="descripcion"
                           class="textarea textarea-bordered h-32 focus:textarea-primary"
                           required
                           placeholder="Describa detalladamente el incidente..."></textarea>
@@ -171,32 +172,28 @@
         </div>
     </div>
 
-<!-- Asignación de Personal -->
-<div class="card bg-base-100 shadow-lg border border-base-300">
-    <div class="card-body">
-        <h3 class="card-title text-lg mb-6 flex items-center gap-2">
-            <i class="mdi mdi-account-multiple-plus text-success"></i> Asignación de Personal
-        </h3>
-        <p class="text-sm opacity-70 mb-4">Puedes seleccionar varios practicantes</p>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-            {% for p in practicantes %}
-            <label class="label cursor-pointer justify-between gap-3 px-4 py-2 border border-base-300 rounded-lg hover:bg-base-200 transition">
-                <span class="label-text flex items-center gap-2">
-                    <i class="mdi mdi-account"></i> {{ p.nombre_completo }}
-                </span>
-                <input type="checkbox" 
-                       name="personal_asignado" 
-                       value="{{ p.id }}"
-                       class="checkbox checkbox-sm">
-            </label>
-            {% endfor %}
+    <!-- Asignación de Personal -->
+    <div class="card bg-base-100 shadow-lg border border-base-300">
+        <div class="card-body">
+            <h3 class="card-title text-lg mb-6 flex items-center gap-2">
+                <i class="mdi mdi-account-multiple-plus text-success"></i> Asignación de Personal
+            </h3>
+            <p class="text-sm opacity-70 mb-4">Puedes seleccionar varios practicantes</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                {% for p in practicantes %}
+                <label class="label cursor-pointer justify-between gap-3 px-4 py-2 border border-base-300 rounded-lg hover:bg-base-200 transition">
+                    <span class="label-text flex items-center gap-2">
+                        <i class="mdi mdi-account"></i> {{ p.nombre_completo }}
+                    </span>
+                    <input type="checkbox"
+                           name="personal_asignado"
+                           value="{{ p.id }}"
+                           class="checkbox checkbox-sm">
+                </label>
+                {% endfor %}
+            </div>
         </div>
     </div>
-</div>
-
-
-
-
 
     <!-- Solución -->
     <div class="card bg-base-100 shadow-lg border border-base-300">
@@ -209,7 +206,7 @@
                     <label class="label">
                         <span class="label-text font-semibold">Detalle de Solución</span>
                     </label>
-                    <textarea name="detalle_solucion" 
+                    <textarea name="detalle_solucion"
                               class="textarea textarea-bordered h-24 focus:textarea-primary"
                               placeholder="Describe la solución aplicada..."></textarea>
                 </div>
@@ -217,10 +214,27 @@
                     <label class="label">
                         <span class="label-text font-semibold">Observaciones y Comentarios</span>
                     </label>
-                    <textarea name="observaciones" 
+                    <textarea name="observaciones"
                               class="textarea textarea-bordered h-20 focus:textarea-primary"
                               placeholder="Comentarios adicionales..."></textarea>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firma Digital -->
+    <div class="card bg-base-100 shadow-lg border border-base-300">
+        <div class="card-body">
+            <h3 class="card-title text-lg mb-6 flex items-center gap-2">
+                <i class="mdi mdi-draw text-info"></i> Firma del Usuario
+            </h3>
+            <div class="w-full h-48 bg-base-200 rounded-lg border-2 border-dashed border-base-300">
+                <canvas id="signature-canvas" class="w-full h-full"></canvas>
+            </div>
+            <div class="card-actions justify-end mt-4">
+                <button type="button" id="clear-button" class="btn btn-ghost gap-2">
+                    <i class="mdi mdi-eraser"></i> Limpiar
+                </button>
             </div>
         </div>
     </div>
@@ -238,13 +252,44 @@
 {% endblock %}
 
 {% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/signature_pad@2.3.2/dist/signature_pad.min.js"></script>
 <script>
-    function toggleOtro() {
-        const select = document.getElementById('tipo_incidente');
-        const otroDiv = document.getElementById('otroTipo');
-        if (select && otroDiv) {
-            otroDiv.style.display = select.value === 'Otro' ? 'block' : 'none';
+    document.addEventListener('DOMContentLoaded', function() {
+        function toggleOtro() {
+            const select = document.getElementById('tipo_incidente');
+            const otroDiv = document.getElementById('otroTipo');
+            if (select && otroDiv) {
+                otroDiv.style.display = select.value === 'Otro' ? 'block' : 'none';
+            }
         }
-    }
+        // Expose the function to the global scope to be accessible by onchange
+        window.toggleOtro = toggleOtro;
+
+        const canvas = document.getElementById('signature-canvas');
+        const signaturePad = new SignaturePad(canvas);
+
+        function resizeCanvas() {
+            const ratio = Math.max(window.devicePixelRatio || 1, 1);
+            canvas.width = canvas.offsetWidth * ratio;
+            canvas.height = canvas.offsetHeight * ratio;
+            canvas.getContext("2d").scale(ratio, ratio);
+            signaturePad.clear(); // otherwise isEmpty() might return incorrect value
+        }
+        window.addEventListener("resize", resizeCanvas);
+        resizeCanvas();
+
+        const clearButton = document.getElementById('clear-button');
+        clearButton.addEventListener('click', function() {
+            signaturePad.clear();
+        });
+
+        const form = document.getElementById('incidente-form');
+        form.addEventListener('submit', function(event) {
+            if (!signaturePad.isEmpty()) {
+                const firmaInput = document.getElementById('firma-input');
+                firmaInput.value = signaturePad.toDataURL('image/png');
+            }
+        });
+    });
 </script>
 {% endblock %}

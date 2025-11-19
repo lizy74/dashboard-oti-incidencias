@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}Mis Notificaciones{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-6">Mis Notificaciones</h1>
+
+    <div class="bg-white shadow-md rounded-lg">
+        <ul class="divide-y divide-gray-200">
+            {% for notificacion in notificaciones %}
+            <li class="p-4 hover:bg-gray-50 {% if not notificacion.leido %}font-bold{% endif %}">
+                <div class="flex justify-between items-center">
+                    <p>{{ notificacion.mensaje }}</p>
+                    <div class="flex items-center space-x-4">
+                        <span class="text-xs text-gray-500">{{ notificacion.fecha_creacion.strftime('%Y-%m-%d %H:%M') }}</span>
+                        {% if not notificacion.leido %}
+                        <a href="{{ url_for('notificaciones.marcar_leida', id=notificacion.id) }}" class="text-blue-500 hover:underline">Marcar como leída</a>
+                        {% else %}
+                        <span class="text-gray-400">Leída</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </li>
+            {% else %}
+            <li class="p-4 text-center text-gray-500">No tienes notificaciones.</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock %}

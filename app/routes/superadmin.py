@@ -2,9 +2,68 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
 from app.extensions import db
 from app.models.usuario import Usuario
+from app.models.incidente import Incidente
+from app.models.practicante import Practicante
+from app.models.notificacion import Notificacion
 from app.decorators import superadmin_required
 
 superadmin_bp = Blueprint('superadmin', __name__, url_prefix='/superadmin')
+
+@superadmin_bp.route('/panel_asignacion')
+@login_required
+@superadmin_required
+def panel_asignacion():
+    incidentes = Incidente.query.order_by(Incidente.fecha_registro.desc()).all()
+    practicantes = Practicante.query.filter_by(activo=True).all()
+
+    # Pre-calcular los IDs de los practicantes asignados a cada incidente
+    for incidente in incidentes:
+        nombres_asignados = [nombre.strip() for nombre in incidente.personal_asignado.split(',') if nombre]
+        practicantes_asignados = Practicante.query.filter(Practicante.nombre_completo.in_(nombres_asignados)).all()
+        incidente.practicantes_asignados_ids = {p.id for p in practicantes_asignados}
+
+    return render_template('superadmin/panel.html', incidentes=incidentes, practicantes=practicantes)
+
+@superadmin_bp.route('/asignar/<int:id>', methods=['POST'])
+@login_required
+@superadmin_required
+def asignar(id):
+    incidente = Incidente.query.get_or_404(id)
+
+    estado = request.form.get('estado')
+    practicantes_ids = request.form.getlist('practicantes')
+    comentario = request.form.get('comentario', '').strip()
+
+    if estado:
+        incidente.estado = estado
+
+    if practicantes_ids:
+        practicantes_asignados = []
+        for pid in practicantes_ids:
+            practicante = Practicante.query.get(pid)
+            if practicante:
+                practicantes_asignados.append(practicante)
+
+        incidente.personal_asignado = ', '.join([p.nombre_completo for p in practicantes_asignados])
+
+        # Enviar notificaciones
+        for practicante in practicantes_asignados:
+            if practicante.usuario:
+                mensaje = f"Se te ha asignado la incidencia #{incidente.id}."
+                if comentario:
+                    mensaje += f" Comentario del admin: '{comentario}'"
+
+                notificacion = Notificacion(
+                    usuario_id=practicante.usuario.id,
+                    mensaje=mensaje
+                )
+                db.session.add(notificacion)
+    else:
+        incidente.personal_asignado = ''
+
+    db.session.commit()
+    flash('Incidente actualizado correctamente.', 'success')
+    return redirect(url_for('superadmin.panel_asignacion'))
 
 @superadmin_bp.route('/administradores')
 @login_required

@@ -6,11 +6,14 @@ from app.config import Config
 from datetime import datetime
 from functools import wraps
 from reportlab.lib.pagesizes import A4
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, PageBreak
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, PageBreak, Image
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib import colors
 from reportlab.lib.units import inch
 import io
+import base64
+import os
+from uuid import uuid4
 
 
 bp = Blueprint('incidentes', __name__, url_prefix='/incidentes')
@@ -142,6 +145,20 @@ def generar_pdf_bytes(incidente):
     
     elementos.append(Spacer(1, 0.3*inch))
     
+    # SECCIÓN 5: FIRMA DEL USUARIO
+    if incidente.firma_path:
+        elementos.append(Paragraph("<b>5. FIRMA DEL USUARIO</b>", styles['Heading3']))
+        elementos.append(Spacer(1, 0.1*inch))
+
+        firma_path_completo = os.path.join('app', 'static', incidente.firma_path)
+        if os.path.exists(firma_path_completo):
+            img = Image(firma_path_completo, width=1.5*inch, height=0.75*inch)
+            elementos.append(img)
+        else:
+            elementos.append(Paragraph("<i>Firma no encontrada.</i>", styles['Normal']))
+
+    elementos.append(Spacer(1, 0.3*inch))
+
     # Pie de página
     fecha_generacion = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
     elementos.append(Paragraph(f"<i>Reporte generado el {fecha_generacion}</i>", styles['Normal']))
@@ -315,6 +332,27 @@ def nuevo():
                     personal_nombres.append(practicante.nombre_completo)
             personal_asignado = ', '.join(personal_nombres) if personal_nombres else ''
             
+            # --- Procesamiento de la firma ---
+            firma_data = request.form.get('firma')
+            firma_path = None
+            if firma_data:
+                try:
+                    firmas_dir = os.path.join('app', 'static', 'firmas')
+                    os.makedirs(firmas_dir, exist_ok=True)
+
+                    header, encoded = firma_data.split(",", 1)
+                    data = base64.b64decode(encoded)
+
+                    filename = f"{uuid4().hex}.png"
+                    filepath = os.path.join(firmas_dir, filename)
+
+                    with open(filepath, "wb") as f:
+                        f.write(data)
+
+                    firma_path = os.path.join('firmas', filename).replace('\\', '/')
+                except Exception as e:
+                    flash(f'Error al guardar la firma: {str(e)}', 'warning')
+
             incidente = Incidente(
                 fecha_incidente=fecha_incidente,
                 hora=hora,
@@ -332,7 +370,8 @@ def nuevo():
                 observaciones=request.form.get('observaciones', ''),
                 celular_encargado=request.form.get('celular_encargado', ''),
                 fecha_registro=datetime.now(),
-                registrado_por=current_user.nombre_completo
+                registrado_por=current_user.nombre_completo,
+                firma_path=firma_path
             )
             
             db.session.add(incidente)

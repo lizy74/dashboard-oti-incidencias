@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Enviar Nuevo Incidente{% endblock %}
+
+{% block content %}
+<div class="max-w-xl mx-auto mt-10">
+    <h1 class="text-2xl font-bold text-center mb-5">Enviar Nuevo Incidente</h1>
+    <form method="POST" enctype="multipart/form-data" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+        {{ form.hidden_tag() }}
+        <div class="mb-4">
+            <label class="block text-gray-700 text-sm font-bold mb-2">
+                {{ form.titulo.label }}
+            </label>
+            {{ form.titulo(class="input input-bordered w-full") }}
+        </div>
+        <div class="mb-4">
+            <label class="block text-gray-700 text-sm font-bold mb-2">
+                {{ form.descripcion.label }}
+            </label>
+            {{ form.descripcion(class="textarea textarea-bordered w-full h-32") }}
+        </div>
+        <div class="mb-6">
+            <label class="block text-gray-700 text-sm font-bold mb-2">
+                {{ form.documento.label }}
+            </label>
+            {{ form.documento(class="file-input file-input-bordered w-full") }}
+        </div>
+        <div class="flex items-center justify-start">
+            {{ form.submit(class="btn btn-primary") }}
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -24,6 +24,9 @@ class Incidente(db.Model):
     registrado_por = db.Column(db.String(100))
     fecha_ultima_edicion = db.Column(db.DateTime)
     editado_por = db.Column(db.String(100))
+    firma_path = db.Column(db.String(255))
+    documento_path = db.Column(db.String(255))
+    estado = db.Column(db.String(50), default='pendiente', nullable=False)
     
     historial = db.relationship('HistorialEdicion', backref='incidente', lazy='dynamic')
     

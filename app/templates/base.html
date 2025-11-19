@@ -155,6 +155,15 @@
                 </div>
 
                 <div class="flex-none gap-2 lg:gap-3">
+                    <!-- Notificaciones -->
+                    <a href="{{ url_for('notificaciones.lista') }}" class="btn btn-ghost btn-circle">
+                        <div class="indicator">
+                            <i class="mdi mdi-bell-outline text-xl"></i>
+                            {% if notificaciones_no_leidas > 0 %}
+                            <span class="badge badge-xs badge-primary indicator-item">{{ notificaciones_no_leidas }}</span>
+                            {% endif %}
+                        </div>
+                    </a>
                     <!-- User Dropdown -->
                     <div class="dropdown dropdown-end">
                         <button tabindex="0" class="btn btn-ghost btn-circle avatar">

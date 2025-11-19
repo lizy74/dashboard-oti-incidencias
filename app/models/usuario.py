@@ -40,6 +40,10 @@ class Usuario(UserMixin, db.Model):
     def puede_gestionar_admins(self):
         """Solo superadmin puede gestionar administradores"""
         return self.rol == 'superadmin'
+
+    def es_solicitante(self):
+        """Verifica si el usuario es solicitante"""
+        return self.rol == 'solicitante'
     
     def __repr__(self):
         return f'<Usuario {self.username}>'
