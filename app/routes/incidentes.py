@@ -208,7 +208,7 @@ def lista():
     tipo = request.args.get('tipo', '')
     practicante_id = request.args.get('practicante_id', '')
     
-    if current_user.rol == 'admin':
+    if current_user.rol in ['admin', 'superadmin']:
         query = Incidente.query
     else:
         query = Incidente.query.filter(
@@ -427,7 +427,7 @@ def editar(id):
                     cambios.append(('tipo_incidente_otro', incidente.tipo_incidente_otro or '', tipo_otro))
                     incidente.tipo_incidente_otro = tipo_otro
             
-            if current_user.rol == 'admin':
+            if current_user.rol in ['admin', 'superadmin']:
                 personal_ids = request.form.getlist('personal_asignado')
                 personal_nombres = []
                 for pid in personal_ids:

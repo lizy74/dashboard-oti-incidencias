@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Administrador{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-warning">
+                    <h4 class="mb-0"><i class="fas fa-edit"></i> Editar Administrador</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('superadmin.editar_administrador', admin_id=admin.id) }}">
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Usuario</label>
+                            <input type="text" class="form-control" id="username" value="{{ admin.username }}" disabled>
+                            <small class="form-text text-muted">El usuario no se puede cambiar</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email *</label>
+                            <input type="email" class="form-control" id="email" name="email" value="{{ admin.email }}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="nombre_completo" class="form-label">Nombre Completo</label>
+                            <input type="text" class="form-control" id="nombre_completo" name="nombre_completo" value="{{ admin.nombre_completo or '' }}">
+                        </div>
+
+                        <hr>
+
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> Deja la contraseña en blanco si no deseas cambiarla
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Nueva Contraseña (opcional)</label>
+                            <input type="password" class="form-control" id="password" name="password" minlength="6">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="password_confirm" class="form-label">Confirmar Nueva Contraseña</label>
+                            <input type="password" class="form-control" id="password_confirm" name="password_confirm">
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('superadmin.gestionar_administradores') }}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-warning">
+                                <i class="fas fa-save"></i> Guardar Cambios
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Validar que las contraseñas coincidan si se proporciona una nueva
+document.querySelector('form').addEventListener('submit', function(e) {
+    var password = document.getElementById('password').value;
+    var confirm = document.getElementById('password_confirm').value;
+    
+    if (password && password !== confirm) {
+        e.preventDefault();
+        alert('Las contraseñas no coinciden');
+        return false;
+    }
+});
+</script>
+{% endblock %}

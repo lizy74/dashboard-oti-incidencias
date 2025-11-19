@@ -4,14 +4,22 @@
 
 {% block content %}
 <!-- Header -->
-<div class="mb-8">
-    <h1 class="text-3xl font-bold text-base-content mb-2 flex items-center gap-3">
-        <div class="p-3 bg-primary/10 rounded-lg">
-            <i class="mdi mdi-account-cog-outline text-2xl text-primary"></i>
-        </div>
-        Gestión de Usuarios
-    </h1>
-    <p class="text-base-content/60">Administra los usuarios del sistema</p>
+<div class="mb-8 flex items-center justify-between">
+    <div>
+        <h1 class="text-3xl font-bold text-base-content mb-2 flex items-center gap-3">
+            <div class="p-3 bg-primary/10 rounded-lg">
+                <i class="mdi mdi-account-cog-outline text-2xl text-primary"></i>
+            </div>
+            Gestión de Usuarios
+        </h1>
+        <p class="text-base-content/60">Administra los usuarios del sistema</p>
+    </div>
+    
+    <!-- Botón Crear Usuario -->
+    <button onclick="abrirModalCrear()" class="btn btn-primary gap-2">
+        <i class="mdi mdi-plus-circle"></i>
+        Crear Usuario
+    </button>
 </div>
 
 <!-- Usuarios Table -->
@@ -21,57 +29,220 @@
             <i class="mdi mdi-account-multiple-outline"></i> Lista de Usuarios
         </h3>
 
-        <div class="overflow-x-auto">
-            <table class="table table-sm">
-                <thead class="bg-base-200">
-                    <tr>
-                        <th><i class="mdi mdi-hashtag"></i> ID</th>
-                        <th><i class="mdi mdi-account-outline"></i> Usuario</th>
-                        <th><i class="mdi mdi-information-outline"></i> Nombre Completo</th>
-                        <th><i class="mdi mdi-email-outline"></i> Email</th>
-                        <th><i class="mdi mdi-shield-outline"></i> Rol</th>
-                        <th><i class="mdi mdi-toggle-switch-outline"></i> Estado</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for u in usuarios %}
-                    <tr class="hover:bg-base-200 transition">
-                        <td class="font-mono text-sm">#{{ u.id }}</td>
-                        <td class="font-semibold">{{ u.username }}</td>
-                        <td>{{ u.nombre_completo }}</td>
-                        <td class="text-sm opacity-80">{{ u.email }}</td>
-                        <td>
-                            <span class="badge badge-lg badge-outline gap-2 px-4 text-xs">
-                                <i class="mdi {% if u.rol == 'admin' %}mdi-shield{% else %}mdi-account{% endif %}"></i>
-                                {{ u.rol|upper }}
-                            </span>
-                        </td>
-                        <td>
-                            <span class="badge {% if u.activo %}badge-success{% else %}badge-error{% endif %}">
-                                {{ 'Activo' if u.activo else 'Inactivo' }}
-                            </span>
-                        </td>
-                        <td>
-                            <button onclick="resetearPassword({{ u.id }}, '{{ u.username }}')" 
-                                    class="btn btn-sm btn-warning gap-1">
-                                <i class="mdi mdi-lock-reset"></i> Resetear
-                            </button>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+       <!-- Tabla Desktop (oculta en móvil) -->
+<div class="hidden lg:block overflow-x-auto">
+    <table class="table table-sm">
+        <thead class="bg-base-200">
+            <tr>
+                <th><i class="mdi mdi-hashtag"></i> ID</th>
+                <th><i class="mdi mdi-account-outline"></i> Usuario</th>
+                <th><i class="mdi mdi-information-outline"></i> Nombre Completo</th>
+                <th><i class="mdi mdi-email-outline"></i> Email</th>
+                <th><i class="mdi mdi-shield-outline"></i> Rol</th>
+                <th><i class="mdi mdi-toggle-switch-outline"></i> Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for u in usuarios %}
+            <tr class="hover:bg-base-200 transition">
+                <td class="font-mono text-sm">#{{ u.id }}</td>
+                <td class="font-semibold">{{ u.username }}</td>
+                <td>{{ u.nombre_completo }}</td>
+                <td class="text-sm opacity-80">{{ u.email }}</td>
+                <td>
+                    <span class="badge badge-lg badge-outline gap-2 px-4 text-xs
+                        {% if u.rol == 'admin' %}badge-primary{% elif u.rol == 'superadmin' %}badge-warning{% else %}badge-info{% endif %}">
+                        <i class="mdi {% if u.rol == 'admin' %}mdi-shield{% elif u.rol == 'superadmin' %}mdi-crown{% else %}mdi-account{% endif %}"></i>
+                        {{ u.rol|upper }}
+                    </span>
+                </td>
+                <td>
+                    <span class="badge {% if u.activo %}badge-success{% else %}badge-error{% endif %}">
+                        {{ 'Activo' if u.activo else 'Inactivo' }}
+                    </span>
+                </td>
+                <td class="space-x-1">
+                    <button onclick="resetearPassword({{ u.id }}, '{{ u.username }}')" 
+                            class="btn btn-sm btn-warning gap-1">
+                        <i class="mdi mdi-lock-reset"></i> Resetear
+                    </button>
+                    
+                    <form method="POST" action="{{ url_for('usuarios.toggle_estado', id=u.id) }}" 
+                          style="display:inline;">
+                        <button type="submit" 
+                                class="btn btn-sm {% if u.activo %}btn-error{% else %}btn-success{% endif %} gap-1">
+                            <i class="mdi mdi-toggle-switch"></i>
+                            {{ 'Desactivar' if u.activo else 'Activar' }}
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 
-            {% if not usuarios %}
-            <div class="text-center py-12 opacity-60">
-                <i class="mdi mdi-inbox-multiple-outline text-5xl mb-2 block opacity-30"></i>
-                <p class="text-sm">No hay usuarios registrados</p>
+<!-- Cards Móvil (ocultas en desktop) -->
+<div class="lg:hidden space-y-4">
+    {% for u in usuarios %}
+    <div class="card bg-base-100 shadow-lg border border-base-300">
+        <div class="card-body p-4">
+            <div class="flex items-start justify-between mb-3">
+                <div>
+                    <h3 class="font-bold text-lg">{{ u.username }}</h3>
+                    <p class="text-sm opacity-70">{{ u.nombre_completo }}</p>
+                </div>
+                <div class="flex flex-col gap-1 items-end">
+                    <span class="badge badge-outline gap-1 text-xs
+                        {% if u.rol == 'admin' %}badge-primary{% elif u.rol == 'superadmin' %}badge-warning{% else %}badge-info{% endif %}">
+                        <i class="mdi {% if u.rol == 'admin' %}mdi-shield{% elif u.rol == 'superadmin' %}mdi-crown{% else %}mdi-account{% endif %}"></i>
+                        {{ u.rol|upper }}
+                    </span>
+                    <span class="badge {% if u.activo %}badge-success{% else %}badge-error{% endif %} text-xs">
+                        {{ 'Activo' if u.activo else 'Inactivo' }}
+                    </span>
+                </div>
             </div>
-            {% endif %}
+            
+            <div class="space-y-2 text-sm mb-4">
+                <p class="flex items-center gap-2">
+                    <i class="mdi mdi-email-outline opacity-70"></i>
+                    <span class="break-all">{{ u.email }}</span>
+                </p>
+                <p class="flex items-center gap-2">
+                    <i class="mdi mdi-hashtag opacity-70"></i>
+                    <span>ID: {{ u.id }}</span>
+                </p>
+            </div>
+            
+            <div class="flex flex-wrap gap-2">
+                <button onclick="resetearPassword({{ u.id }}, '{{ u.username }}')" 
+                        class="btn btn-sm btn-warning gap-1 flex-1">
+                    <i class="mdi mdi-lock-reset"></i> Resetear
+                </button>
+                
+                <form method="POST" action="{{ url_for('usuarios.toggle_estado', id=u.id) }}" 
+                      style="display:inline;">
+                    <button type="submit" 
+                            class="btn btn-sm {% if u.activo %}btn-error{% else %}btn-success{% endif %} gap-1">
+                        <i class="mdi mdi-toggle-switch"></i>
+                        {{ 'Desactivar' if u.activo else 'Activar' }}
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
+    {% endfor %}
 </div>
+
+<!-- Mensaje si no hay usuarios -->
+{% if not usuarios %}
+<div class="text-center py-12 opacity-60">
+    <i class="mdi mdi-inbox-multiple-outline text-5xl mb-2 block opacity-30"></i>
+    <p class="text-sm">No hay usuarios registrados</p>
+</div>
+{% endif %}
+
+    </div>
+</div>
+
+<!-- Modal Crear Usuario -->
+<dialog id="modalCrear" class="modal">
+    <div class="modal-box w-full max-w-lg">
+        <button onclick="cerrarModalCrear()" class="btn btn-sm btn-ghost float-right">
+            <i class="mdi mdi-close"></i>
+        </button>
+        
+        <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
+            <i class="mdi mdi-plus-circle text-primary"></i> Crear Nuevo Usuario
+        </h3>
+
+        <form method="POST" action="{{ url_for('usuarios.crear') }}" class="space-y-4">
+            <div class="form-control w-full">
+                <label class="label">
+                    <span class="label-text font-semibold">Nombre de Usuario *</span>
+                </label>
+                <input type="text" name="username" 
+                       class="input input-bordered focus:input-primary"
+                       placeholder="usuario123"
+                       required>
+            </div>
+
+            <div class="form-control w-full">
+                <label class="label">
+                    <span class="label-text font-semibold">Email *</span>
+                </label>
+                <input type="email" name="email" 
+                       class="input input-bordered focus:input-primary"
+                       placeholder="usuario@unap.edu.pe"
+                       required>
+            </div>
+
+            <div class="form-control w-full">
+                <label class="label">
+                    <span class="label-text font-semibold">Nombre Completo *</span>
+                </label>
+                <input type="text" name="nombre_completo" 
+                       class="input input-bordered focus:input-primary"
+                       placeholder="Juan Pérez García"
+                       required>
+            </div>
+
+            <div class="form-control w-full">
+                <label class="label">
+                    <span class="label-text font-semibold">Contraseña *</span>
+                </label>
+                <input type="text" name="password" 
+                       class="input input-bordered focus:input-primary"
+                       placeholder="Mínimo 6 caracteres"
+                       minlength="6"
+                       required>
+                <label class="label">
+                    <span class="label-text-alt text-xs opacity-70">
+                        <i class="mdi mdi-information-outline"></i> El usuario recibirá esta contraseña
+                    </span>
+                </label>
+            </div>
+
+            <div class="form-control w-full">
+                <label class="label">
+                    <span class="label-text font-semibold">Rol *</span>
+                </label>
+                <select name="rol" class="select select-bordered focus:select-primary" required>
+                    {% if current_user.rol == 'superadmin' %}
+                    <option value="">Selecciona un rol...</option>
+                    <option value="admin">Administrador</option>
+                    <option value="practicante">Practicante</option>
+                    {% else %}
+                    <option value="practicante">Practicante</option>
+                    {% endif %}
+                </select>
+                <label class="label">
+                    <span class="label-text-alt text-xs opacity-70">
+                        {% if current_user.rol == 'superadmin' %}
+                        <i class="mdi mdi-crown"></i> Como Super Admin puedes crear Administradores y Practicantes
+                        {% else %}
+                        <i class="mdi mdi-shield"></i> Como Admin solo puedes crear Practicantes
+                        {% endif %}
+                    </span>
+                </label>
+            </div>
+
+            <div class="modal-action">
+                <button type="button" onclick="cerrarModalCrear()" class="btn btn-outline">
+                    Cancelar
+                </button>
+                <button type="submit" class="btn btn-primary gap-2">
+                    <i class="mdi mdi-content-save"></i> Crear Usuario
+                </button>
+            </div>
+        </form>
+    </div>
+    <form method="dialog" class="modal-backdrop">
+        <button>close</button>
+    </form>
+</dialog>
 
 <!-- Modal Resetear Contraseña -->
 <dialog id="modalResetear" class="modal">
@@ -103,7 +274,6 @@
                 </label>
             </div>
 
-            <!-- Actions -->
             <div class="modal-action">
                 <button type="button" onclick="cerrarModalResetear()" class="btn btn-outline">
                     Cancelar
@@ -122,6 +292,14 @@
 
 {% block scripts %}
 <script>
+    function abrirModalCrear() {
+        document.getElementById('modalCrear').showModal();
+    }
+
+    function cerrarModalCrear() {
+        document.getElementById('modalCrear').close();
+    }
+
     function resetearPassword(id, username) {
         document.getElementById('formResetear').action = '/usuarios/resetear-password/' + id;
         document.getElementById('reset_username').textContent = username;

@@ -1,0 +1,306 @@
+{% extends "base.html" %}
+
+{% block title %}Gestionar Administradores{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<div class="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <div>
+        <h1 class="text-3xl font-bold text-base-content mb-2 flex items-center gap-3">
+            <div class="p-3 bg-warning/10 rounded-lg">
+                <i class="mdi mdi-shield-account text-2xl text-warning"></i>
+            </div>
+            Gestión de Administradores
+        </h1>
+        <p class="text-base-content/60">Administra las cuentas de administradores del sistema</p>
+    </div>
+    <button onclick="abrirModalCrear()" class="btn btn-warning gap-2 whitespace-nowrap">
+        <i class="mdi mdi-plus-circle"></i>
+        Crear Administrador
+    </button>
+</div>
+
+<!-- Tabla Desktop (oculta en móvil) -->
+<div class="hidden lg:block card bg-base-100 shadow-lg border border-base-300">
+    <div class="card-body">
+        <h3 class="card-title text-lg mb-6 flex items-center gap-2">
+            <i class="mdi mdi-shield-account-outline text-warning"></i> Lista de Administradores
+        </h3>
+        
+        <div class="overflow-x-auto">
+            <table class="table table-sm">
+                <thead class="bg-base-200">
+                    <tr>
+                        <th><i class="mdi mdi-hashtag"></i> ID</th>
+                        <th><i class="mdi mdi-account"></i> Usuario</th>
+                        <th><i class="mdi mdi-information-outline"></i> Nombre Completo</th>
+                        <th><i class="mdi mdi-email-outline"></i> Email</th>
+                        <th><i class="mdi mdi-calendar"></i> Fecha Creación</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for admin in administradores %}
+                    <tr class="hover:bg-base-200 transition">
+                        <td class="font-mono text-sm">#{{ admin.id }}</td>
+                        <td class="font-semibold">{{ admin.username }}</td>
+                        <td>{{ admin.nombre_completo or '-' }}</td>
+                        <td class="text-sm opacity-80">{{ admin.email }}</td>
+                        <td>{{ admin.fecha_creacion.strftime('%d/%m/%Y') if admin.fecha_creacion else '-' }}</td>
+                        <td class="space-x-1">
+                            <button onclick="editarAdmin({{ admin.id }}, '{{ admin.username }}', '{{ admin.email }}', '{{ admin.nombre_completo or '' }}')"
+                                    class="btn btn-sm btn-warning gap-1">
+                                <i class="mdi mdi-pencil"></i> Editar
+                            </button>
+                            <form method="POST" 
+                                  action="{{ url_for('superadmin.eliminar_administrador', admin_id=admin.id) }}" 
+                                  style="display:inline;"
+                                  onsubmit="return confirm('¿Estás seguro de eliminar este administrador?');">
+                                <button type="submit" class="btn btn-sm btn-error gap-1">
+                                    <i class="mdi mdi-delete"></i> Eliminar
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            {% if not administradores %}
+            <div class="text-center py-12 opacity-60">
+                <i class="mdi mdi-inbox-multiple-outline text-5xl mb-2 block opacity-30"></i>
+                <p class="text-sm">No hay administradores registrados</p>
+                <button onclick="abrirModalCrear()" class="btn btn-warning gap-2 mt-4">
+                    <i class="mdi mdi-plus-circle"></i> Crear Primer Administrador
+                </button>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Cards Móvil (ocultas en desktop) -->
+<div class="lg:hidden space-y-4">
+    {% for admin in administradores %}
+    <div class="card bg-base-100 shadow-lg border border-base-300">
+        <div class="card-body p-4">
+            <div class="flex items-start justify-between mb-3">
+                <div>
+                    <h3 class="font-bold text-lg">{{ admin.username }}</h3>
+                    <p class="text-sm opacity-70">{{ admin.nombre_completo or '-' }}</p>
+                </div>
+                <span class="badge badge-warning gap-1">
+                    <i class="mdi mdi-shield"></i> Admin
+                </span>
+            </div>
+            
+            <div class="space-y-2 text-sm mb-4">
+                <p class="flex items-center gap-2">
+                    <i class="mdi mdi-email-outline opacity-70"></i>
+                    <span>{{ admin.email }}</span>
+                </p>
+                <p class="flex items-center gap-2">
+                    <i class="mdi mdi-calendar opacity-70"></i>
+                    <span>{{ admin.fecha_creacion.strftime('%d/%m/%Y') if admin.fecha_creacion else '-' }}</span>
+                </p>
+                <p class="flex items-center gap-2">
+                    <i class="mdi mdi-hashtag opacity-70"></i>
+                    <span>ID: {{ admin.id }}</span>
+                </p>
+            </div>
+            
+            <div class="card-actions justify-end gap-2">
+                <button onclick="editarAdmin({{ admin.id }}, '{{ admin.username }}', '{{ admin.email }}', '{{ admin.nombre_completo or '' }}')"
+                        class="btn btn-sm btn-warning gap-1">
+                    <i class="mdi mdi-pencil"></i> Editar
+                </button>
+                <form method="POST" 
+                      action="{{ url_for('superadmin.eliminar_administrador', admin_id=admin.id) }}" 
+                      style="display:inline;"
+                      onsubmit="return confirm('¿Estás seguro de eliminar este administrador?');">
+                    <button type="submit" class="btn btn-sm btn-error gap-1">
+                        <i class="mdi mdi-delete"></i> Eliminar
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+    {% if not administradores %}
+    <div class="card bg-base-100 shadow-lg border border-base-300">
+        <div class="card-body text-center py-12">
+            <i class="mdi mdi-inbox-multiple-outline text-5xl mb-2 opacity-30"></i>
+            <p class="text-sm opacity-60 mb-4">No hay administradores registrados</p>
+            <button onclick="abrirModalCrear()" class="btn btn-warning gap-2">
+                <i class="mdi mdi-plus-circle"></i> Crear Primer Administrador
+            </button>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Modal Crear Administrador -->
+<dialog id="modalCrear" class="modal">
+    <div class="modal-box w-full max-w-lg">
+        <button onclick="cerrarModalCrear()" class="btn btn-sm btn-ghost float-right">
+            <i class="mdi mdi-close"></i>
+        </button>
+        
+        <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
+            <i class="mdi mdi-shield-plus text-warning"></i> Crear Nuevo Administrador
+        </h3>
+
+        <form method="POST" action="{{ url_for('superadmin.crear_administrador') }}" class="space-y-4">
+            <div class="form-control w-full">
+                <label class="label">
+                    <span class="label-text font-semibold">Nombre de Usuario *</span>
+                </label>
+                <input type="text" name="username" 
+                       class="input input-bordered focus:input-primary"
+                       placeholder="admin123"
+                       required>
+            </div>
+
+            <div class="form-control w-full">
+                <label class="label">
+                    <span class="label-text font-semibold">Email *</span>
+                </label>
+                <input type="email" name="email" 
+                       class="input input-bordered focus:input-primary"
+                       placeholder="admin@unap.edu.pe"
+                       required>
+            </div>
+
+            <div class="form-control w-full">
+                <label class="label">
+                    <span class="label-text font-semibold">Nombre Completo</span>
+                </label>
+                <input type="text" name="nombre_completo" 
+                       class="input input-bordered focus:input-primary"
+                       placeholder="Juan Pérez García">
+            </div>
+
+            <div class="form-control w-full">
+                <label class="label">
+                    <span class="label-text font-semibold">Contraseña *</span>
+                </label>
+                <input type="password" name="password" 
+                       class="input input-bordered focus:input-primary"
+                       placeholder="Mínimo 6 caracteres"
+                       minlength="6"
+                       required>
+                <label class="label">
+                    <span class="label-text-alt text-xs opacity-70">
+                        <i class="mdi mdi-shield-lock-outline"></i> El administrador podrá cambiarla después
+                    </span>
+                </label>
+            </div>
+
+            <div class="modal-action">
+                <button type="button" onclick="cerrarModalCrear()" class="btn btn-outline">
+                    Cancelar
+                </button>
+                <button type="submit" class="btn btn-warning gap-2">
+                    <i class="mdi mdi-shield-plus"></i> Crear Administrador
+                </button>
+            </div>
+        </form>
+    </div>
+    <form method="dialog" class="modal-backdrop">
+        <button>close</button>
+    </form>
+</dialog>
+
+<!-- Modal Editar Administrador -->
+<dialog id="modalEditar" class="modal">
+    <div class="modal-box w-full max-w-lg">
+        <button onclick="cerrarModalEditar()" class="btn btn-sm btn-ghost float-right">
+            <i class="mdi mdi-close"></i>
+        </button>
+        
+        <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
+            <i class="mdi mdi-pencil text-warning"></i> Editar Administrador
+        </h3>
+
+        <form id="formEditar" method="POST" class="space-y-4">
+            <div class="form-control w-full">
+                <label class="label">
+                    <span class="label-text font-semibold">Nombre de Usuario *</span>
+                </label>
+                <input type="text" id="edit_username" name="username" 
+                       class="input input-bordered focus:input-primary"
+                       required>
+            </div>
+
+            <div class="form-control w-full">
+                <label class="label">
+                    <span class="label-text font-semibold">Email *</span>
+                </label>
+                <input type="email" id="edit_email" name="email" 
+                       class="input input-bordered focus:input-primary"
+                       required>
+            </div>
+
+            <div class="form-control w-full">
+                <label class="label">
+                    <span class="label-text font-semibold">Nombre Completo</span>
+                </label>
+                <input type="text" id="edit_nombre_completo" name="nombre_completo" 
+                       class="input input-bordered focus:input-primary">
+            </div>
+
+            <div class="form-control w-full">
+                <label class="label">
+                    <span class="label-text font-semibold">Nueva Contraseña</span>
+                </label>
+                <input type="password" id="edit_password" name="password" 
+                       class="input input-bordered focus:input-primary"
+                       placeholder="Dejar en blanco para no cambiar">
+                <label class="label">
+                    <span class="label-text-alt text-xs opacity-70">
+                        <i class="mdi mdi-information-outline"></i> Solo completa si deseas cambiar la contraseña
+                    </span>
+                </label>
+            </div>
+
+            <div class="modal-action">
+                <button type="button" onclick="cerrarModalEditar()" class="btn btn-outline">
+                    Cancelar
+                </button>
+                <button type="submit" class="btn btn-warning gap-2">
+                    <i class="mdi mdi-content-save"></i> Guardar Cambios
+                </button>
+            </div>
+        </form>
+    </div>
+    <form method="dialog" class="modal-backdrop">
+        <button>close</button>
+    </form>
+</dialog>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function abrirModalCrear() {
+        document.getElementById('modalCrear').showModal();
+    }
+
+    function cerrarModalCrear() {
+        document.getElementById('modalCrear').close();
+    }
+
+    function editarAdmin(id, username, email, nombre_completo) {
+        document.getElementById('formEditar').action = '/superadmin/administradores/editar/' + id;
+        document.getElementById('edit_username').value = username;
+        document.getElementById('edit_email').value = email;
+        document.getElementById('edit_nombre_completo').value = nombre_completo;
+        document.getElementById('edit_password').value = '';
+        document.getElementById('modalEditar').showModal();
+    }
+
+    function cerrarModalEditar() {
+        document.getElementById('modalEditar').close();
+    }
+</script>
+{% endblock %}

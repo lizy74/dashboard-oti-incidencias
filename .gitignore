@@ -4,14 +4,27 @@ __pycache__/
 *$py.class
 *.so
 .Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
 
 # Virtual Environment
-env/
 venv/
-.venv/
+env/
 ENV/
-env.bak/
-venv.bak/
+.venv
 
 # Flask
 instance/
@@ -21,10 +34,8 @@ instance/
 *.db
 *.sqlite
 *.sqlite3
-
-# Environment variables
-.env
-.flaskenv
+incidencias.db
+incidencias_backup_*.db
 
 # IDE
 .vscode/
@@ -32,16 +43,31 @@ instance/
 *.swp
 *.swo
 *~
+.DS_Store
+
+# Logs
+*.log
+logs/
+
+# Environment variables
+.env
+.env.local
+.flaskenv
+
+# Temporary files
+*.tmp
+*.bak
+*.cache
 
 # OS
-.DS_Store
 Thumbs.db
+.DS_Store
 
-# Migrations
-migrations/versions/
-
-# Backups
-backups/*.csv
-backups/*.db
-*.exe
-
+# Scripts temporales
+inspeccionar_db.py
+ver_usuarios.py
+promover_admin.py
+crear_superadmin.py
+migrar_base_datos.py
+ajustar_modelos.py
+eliminar_importar.py

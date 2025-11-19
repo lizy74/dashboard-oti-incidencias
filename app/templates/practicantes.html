@@ -26,7 +26,8 @@
             <i class="mdi mdi-clipboard-list-outline text-info"></i> Lista de Practicantes
         </h3>
         
-        <div class="overflow-x-auto">
+        <!-- Tabla Desktop (oculta en móvil) -->
+        <div class="hidden lg:block overflow-x-auto">
             <table class="table table-sm">
                 <thead class="bg-base-200">
                     <tr>
@@ -53,7 +54,6 @@
                             </span>
                         </td>
                         <td>
-                            <!-- Edit Button -->
                             <button 
                                 onclick="editarPracticante({{ p.id }}, '{{ p.nombre_completo }}', '{{ p.celular }}', '{{ p.email }}', '{{ p.especialidad }}')"
                                 class="btn btn-sm btn-outline gap-1"
@@ -61,7 +61,6 @@
                                 <i class="mdi mdi-pencil-outline"></i>
                             </button>
 
-                            <!-- Toggle State -->
                             <form method="POST" 
                                   action="{{ url_for('practicantes.toggle_estado', id=p.id) }}"
                                   style="display:inline;">
@@ -72,7 +71,6 @@
                                 </button>
                             </form>
 
-                            <!-- Delete Button -->
                             <form method="POST" 
                                   action="{{ url_for('practicantes.eliminar', id=p.id) }}"
                                   style="display:inline;"
@@ -88,19 +86,78 @@
                     {% endfor %}
                 </tbody>
             </table>
-
-            {% if not practicantes %}
-            <div class="text-center py-12 opacity-60">
-                <i class="mdi mdi-inbox-multiple-outline text-5xl mb-2 block opacity-30"></i>
-                <p class="text-sm">No hay practicantes registrados</p>
-                <button onclick="abrirModalAgregar()" class="btn btn-primary gap-2 mt-4">
-                    <i class="mdi mdi-plus-circle-outline"></i> Crear Primer Practicante
-                </button>
-            </div>
-            {% endif %}
         </div>
+
+        <!-- Cards Móvil (ocultas en desktop) -->
+        <div class="lg:hidden space-y-4">
+            {% for p in practicantes %}
+            <div class="card bg-base-100 shadow-lg border border-base-300">
+                <div class="card-body p-4">
+                    <div class="flex items-start justify-between mb-3">
+                        <div>
+                            <h3 class="font-bold text-lg">{{ p.nombre_completo }}</h3>
+                            <p class="text-sm opacity-70">{{ p.especialidad }}</p>
+                        </div>
+                        <span class="badge {% if p.activo %}badge-success{% else %}badge-error{% endif %}">
+                            {{ 'Activo' if p.activo else 'Inactivo' }}
+                        </span>
+                    </div>
+                    
+                    <div class="space-y-2 text-sm mb-4">
+                        <p class="flex items-center gap-2">
+                            <i class="mdi mdi-phone-outline opacity-70"></i>
+                            <span>{{ p.celular }}</span>
+                        </p>
+                        <p class="flex items-center gap-2">
+                            <i class="mdi mdi-email-outline opacity-70"></i>
+                            <span class="break-all">{{ p.email }}</span>
+                        </p>
+                    </div>
+                    
+                    <div class="flex flex-wrap gap-2">
+                        <button 
+                            onclick="editarPracticante({{ p.id }}, '{{ p.nombre_completo }}', '{{ p.celular }}', '{{ p.email }}', '{{ p.especialidad }}')"
+                            class="btn btn-sm btn-outline gap-1 flex-1">
+                            <i class="mdi mdi-pencil"></i> Editar
+                        </button>
+
+                        <form method="POST" 
+                              action="{{ url_for('practicantes.toggle_estado', id=p.id) }}"
+                              style="display:inline;">
+                            <button type="submit" 
+                                    class="btn btn-sm {% if p.activo %}btn-warning{% else %}btn-success{% endif %} gap-1">
+                                <i class="mdi mdi-toggle-switch"></i>
+                                {{ 'Desactivar' if p.activo else 'Activar' }}
+                            </button>
+                        </form>
+
+                        <form method="POST" 
+                              action="{{ url_for('practicantes.eliminar', id=p.id) }}"
+                              style="display:inline;"
+                              onsubmit="return confirm('¿Seguro que deseas eliminar a {{ p.nombre_completo }}?');">
+                            <button type="submit" class="btn btn-sm btn-error gap-1">
+                                <i class="mdi mdi-delete"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Mensaje si no hay practicantes -->
+        {% if not practicantes %}
+        <div class="text-center py-12 opacity-60">
+            <i class="mdi mdi-inbox-multiple-outline text-5xl mb-2 block opacity-30"></i>
+            <p class="text-sm">No hay practicantes registrados</p>
+            <button onclick="abrirModalAgregar()" class="btn btn-primary gap-2 mt-4">
+                <i class="mdi mdi-plus-circle-outline"></i> Crear Primer Practicante
+            </button>
+        </div>
+        {% endif %}
     </div>
 </div>
+
 
 <!-- ===================================
      MODAL AGREGAR PRACTICANTE
@@ -110,7 +167,7 @@
         <button onclick="cerrarModalAgregar()" class="btn btn-sm btn-ghost float-right">
             <i class="mdi mdi-close"></i>
         </button>
-        
+
         <h3 class="font-bold text-lg mb-6 flex items-center gap-2">
             <i class="mdi mdi-plus-circle-outline text-success"></i> Agregar Practicante
         </h3>
@@ -121,11 +178,8 @@
                 <label class="label">
                     <span class="label-text font-semibold">Nombre Completo *</span>
                 </label>
-                <input type="text" 
-                       name="nombre_completo" 
-                       placeholder="Ej: Lizbeth Cecilia Apaza Quispe"
-                       class="input input-bordered focus:input-primary"
-                       required>
+                <input type="text" name="nombre_completo" placeholder="Ej: Lizbeth Cecilia Apaza Quispe"
+                    class="input input-bordered focus:input-primary" required>
             </div>
 
             <!-- Número (Celular) -->
@@ -133,10 +187,8 @@
                 <label class="label">
                     <span class="label-text font-semibold">Número (Celular)</span>
                 </label>
-                <input type="text" 
-                       name="celular" 
-                       placeholder="987654321"
-                       class="input input-bordered focus:input-primary">
+                <input type="text" name="celular" placeholder="987654321"
+                    class="input input-bordered focus:input-primary">
             </div>
 
             <!-- Email -->
@@ -144,11 +196,8 @@
                 <label class="label">
                     <span class="label-text font-semibold">Email *</span>
                 </label>
-                <input type="email" 
-                       name="email" 
-                       placeholder="practicante@unap.edu.pe"
-                       class="input input-bordered focus:input-primary"
-                       required>
+                <input type="email" name="email" placeholder="practicante@unap.edu.pe"
+                    class="input input-bordered focus:input-primary" required>
             </div>
 
             <!-- Especialidad -->
@@ -187,7 +236,7 @@
         <button onclick="cerrarModalEditar()" class="btn btn-sm btn-ghost float-right">
             <i class="mdi mdi-close"></i>
         </button>
-        
+
         <h3 class="font-bold text-lg mb-6 flex items-center gap-2">
             <i class="mdi mdi-pencil-outline text-primary"></i> Editar Practicante
         </h3>
@@ -198,8 +247,8 @@
                 <label class="label">
                     <span class="label-text font-semibold">Nombre Completo *</span>
                 </label>
-                <input type="text" id="edit_nombre" name="nombre_completo" 
-                       class="input input-bordered focus:input-primary" required>
+                <input type="text" id="edit_nombre" name="nombre_completo"
+                    class="input input-bordered focus:input-primary" required>
             </div>
 
             <!-- Celular -->
@@ -207,8 +256,7 @@
                 <label class="label">
                     <span class="label-text font-semibold">Número</span>
                 </label>
-                <input type="text" id="edit_celular" name="celular" 
-                       class="input input-bordered focus:input-primary">
+                <input type="text" id="edit_celular" name="celular" class="input input-bordered focus:input-primary">
             </div>
 
             <!-- Email -->
@@ -216,8 +264,8 @@
                 <label class="label">
                     <span class="label-text font-semibold">Email *</span>
                 </label>
-                <input type="email" id="edit_email" name="email" 
-                       class="input input-bordered focus:input-primary" required>
+                <input type="email" id="edit_email" name="email" class="input input-bordered focus:input-primary"
+                    required>
             </div>
 
             <!-- Especialidad -->
@@ -225,8 +273,7 @@
                 <label class="label">
                     <span class="label-text font-semibold">Especialidad</span>
                 </label>
-                <select id="edit_especialidad" name="especialidad" 
-                        class="select select-bordered focus:select-primary">
+                <select id="edit_especialidad" name="especialidad" class="select select-bordered focus:select-primary">
                     {% for esp in especialidades %}
                     <option value="{{ esp }}">{{ esp }}</option>
                     {% endfor %}

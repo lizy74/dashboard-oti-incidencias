@@ -54,3 +54,38 @@ def cambiar_password():
             return redirect(url_for('dashboard.index'))
     
     return render_template('cambiar_password.html')
+
+@bp.route('/perfil')
+@login_required
+def perfil():
+    """Ver perfil del usuario actual"""
+    return render_template('auth/perfil.html')
+
+@bp.route('/perfil/editar', methods=['POST'])
+@login_required
+def editar_perfil():
+    """Editar información del perfil"""
+    try:
+        nombre_completo = request.form.get('nombre_completo')
+        email = request.form.get('email')
+        
+        # Verificar que el email no esté usado por otro usuario
+        if email != current_user.email:
+            usuario_existente = Usuario.query.filter_by(email=email).first()
+            if usuario_existente:
+                flash('El email ya está en uso por otro usuario', 'error')
+                return redirect(url_for('auth.perfil'))
+        
+        # Actualizar datos
+        current_user.nombre_completo = nombre_completo
+        current_user.email = email
+        
+        db.session.commit()
+        flash('Perfil actualizado correctamente', 'success')
+        
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error al actualizar perfil: {str(e)}', 'error')
+    
+    return redirect(url_for('auth.perfil'))
+

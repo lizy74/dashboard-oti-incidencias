@@ -3,20 +3,13 @@ from flask_login import login_required, current_user
 from app.models import Practicante, Usuario
 from app.extensions import db
 from app.config import Config
-from functools import wraps
+from app.decorators import admin_required  # Usar el decorador correcto
+
 
 bp = Blueprint('practicantes', __name__, url_prefix='/practicantes')
 
-def admin_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if current_user.rol != 'admin':
-            flash('No tienes permisos para acceder a esta página', 'error')
-            return redirect(url_for('dashboard.index'))
-        return f(*args, **kwargs)
-    return decorated_function
 
-@bp.route('/')
+@bp.route('/lista')
 @login_required
 @admin_required
 def lista():
@@ -25,6 +18,7 @@ def lista():
         practicantes=practicantes,
         especialidades=Config.ESPECIALIDADES
     )
+
 
 @bp.route('/crear', methods=['POST'])
 @login_required
@@ -78,6 +72,7 @@ def crear():
     
     return redirect(url_for('practicantes.lista'))
 
+
 @bp.route('/editar/<int:id>', methods=['POST'])
 @login_required
 @admin_required
@@ -103,6 +98,7 @@ def editar(id):
     
     return redirect(url_for('practicantes.lista'))
 
+
 @bp.route('/toggle/<int:id>', methods=['POST'])
 @login_required
 @admin_required
@@ -125,7 +121,6 @@ def toggle_estado(id):
     return redirect(url_for('practicantes.lista'))
 
 
-
 @bp.route('/eliminar/<int:id>', methods=['POST'])
 @login_required
 @admin_required
@@ -134,7 +129,6 @@ def eliminar(id):
         practicante = Practicante.query.get_or_404(id)
         nombre_practicante = practicante.nombre_completo
         
-    
         if practicante.usuario:
             usuario_id = practicante.usuario.id
             

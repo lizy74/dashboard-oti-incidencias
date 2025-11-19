@@ -14,15 +14,16 @@ def create_app(config_class=Config):
     login_manager.init_app(app)
     migrate.init_app(app, db)
     
-    from app.routes import auth, dashboard, incidentes, reportes, importar, practicantes, usuarios
+    from app.routes import auth, dashboard, incidentes, reportes, practicantes, usuarios, superadmin
     
     app.register_blueprint(auth.bp)
     app.register_blueprint(dashboard.bp)
     app.register_blueprint(incidentes.bp)
     app.register_blueprint(reportes.bp)
-    app.register_blueprint(importar.bp)
     app.register_blueprint(practicantes.bp)
     app.register_blueprint(usuarios.bp)
+    app.register_blueprint(superadmin.superadmin_bp)
+
     
     with app.app_context():
         db.create_all()

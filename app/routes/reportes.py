@@ -3,18 +3,19 @@ from flask_login import login_required, current_user
 from app.models import Incidente, Practicante
 from app.extensions import db
 from app.config import Config
+from app.decorators import admin_required  # IMPORTAR EL CORRECTO
 import pandas as pd
 from io import BytesIO
 from datetime import datetime
 
+
 bp = Blueprint('reportes', __name__, url_prefix='/reportes')
+
 
 @bp.route('/')
 @login_required
+@admin_required  # Ahora permite admin y superadmin
 def index():
-    if current_user.rol != 'admin':
-        return render_template('reportes.html', es_admin=False)
-    
     practicantes = Practicante.query.filter_by(activo=True).all()
     return render_template('reportes.html',
         es_admin=True,
@@ -24,8 +25,10 @@ def index():
         prioridades=Config.PRIORIDADES
     )
 
+
 @bp.route('/generar', methods=['POST'])
 @login_required
+@admin_required
 def generar():
     try:
         tipo_reporte = request.form.get('tipo_reporte')

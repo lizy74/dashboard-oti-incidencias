@@ -5,12 +5,14 @@ from app.extensions import db
 from sqlalchemy import func
 from datetime import date
 
+
 bp = Blueprint('dashboard', __name__, url_prefix='/')
+
 
 @bp.route('/')
 @login_required
 def index():
-    if current_user.rol == 'admin':
+    if current_user.rol in ['admin', 'superadmin']:
         return dashboard_admin()
     elif current_user.rol == 'practicante':
         return dashboard_practicante()
@@ -19,6 +21,7 @@ def index():
 
 
 def dashboard_admin():
+    # Recopilar todas las estadísticas
     total_incidentes = Incidente.query.count()
     prioridad_alta = Incidente.query.filter_by(prioridad='Alta').count()
     prioridad_media = Incidente.query.filter_by(prioridad='Media').count()
@@ -30,31 +33,28 @@ def dashboard_admin():
         func.date(Incidente.fecha_registro) == hoy
     ).count()
     
-    # 🔧 CONTEO MEJORADO - Limpiar espacios extras
+    # Conteo de incidentes por practicante
     practicantes = Practicante.query.filter_by(activo=True).all()
     incidentes_por_practicante = []
     
     for p in practicantes:
         count = 0
-        # Limpiar espacios del nombre del practicante
         nombre_limpio = p.nombre_completo.strip()
         todos_incidentes = Incidente.query.all()
         
         for inc in todos_incidentes:
             if inc.personal_asignado:
                 personal_str = str(inc.personal_asignado).strip()
-                # Dividir por comas y limpiar espacios de CADA nombre
                 nombres_asignados = [n.strip() for n in personal_str.split(',')]
                 
-                # Comparación case-insensitive y sin espacios
                 for nombre in nombres_asignados:
                     if nombre_limpio.lower() == nombre.strip().lower():
                         count += 1
-                        break  # Una vez por incidente
+                        break
         
         if count > 0:
             incidentes_por_practicante.append({
-                'nombre': p.nombre_completo.strip(),  # ← También limpiar aquí
+                'nombre': p.nombre_completo.strip(),
                 'total': count
             })
     
@@ -63,21 +63,19 @@ def dashboard_admin():
     ultimos_incidentes = Incidente.query.order_by(
         Incidente.fecha_registro.desc()
     ).limit(10).all()
-
-    
     
     incidentes_por_tipo = db.session.query(
         Incidente.tipo_incidente,
         func.count(Incidente.id)
     ).group_by(Incidente.tipo_incidente).all()
     
-
-
     incidentes_por_sede = db.session.query(
         Incidente.sede,
         func.count(Incidente.id)
     ).group_by(Incidente.sede).all()
     
+    # Renderizar el mismo template para admin y superadmin
+    # El template mostrará la sección especial solo si es superadmin
     return render_template('dashboard_admin.html',
         total_incidentes=total_incidentes,
         prioridad_alta=prioridad_alta,
@@ -90,8 +88,6 @@ def dashboard_admin():
         incidentes_por_tipo=incidentes_por_tipo,
         incidentes_por_sede=incidentes_por_sede
     )
-
-
 
 
 def dashboard_practicante():

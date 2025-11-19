@@ -14,6 +14,96 @@
     <p class="text-base-content/60">Resumen general del sistema</p>
 </div>
 
+<!-- SECCIÓN EXCLUSIVA SUPER ADMIN -->
+{% if current_user.rol == 'superadmin' %}
+<div class="mb-8">
+    <div class="alert alert-warning shadow-lg mb-6">
+        <div>
+            <i class="mdi mdi-crown text-2xl"></i>
+            <span>
+                <h3 class="font-bold">Sesión como Super Administrador</h3>
+                <div class="text-xs">Tienes acceso completo a todas las funciones del sistema</div>
+            </span>
+        </div>
+    </div>
+
+    <h2 class="text-2xl font-bold text-base-content mb-4 flex items-center gap-2">
+        <i class="mdi mdi-shield-crown text-warning"></i>
+        Panel de Super Administrador
+    </h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        <!-- Gestionar Administradores -->
+        <div
+            class="card bg-gradient-to-br from-amber-50 to-amber-100 shadow-lg border-l-4 border-amber-500 hover:shadow-xl transition-all duration-300">
+            <div class="card-body">
+                <div class="flex items-center justify-between mb-4">
+                    <i class="mdi mdi-shield-account text-5xl text-amber-600 opacity-20"></i>
+                </div>
+                <h3 class="card-title text-amber-700 mb-2">
+                    <i class="mdi mdi-shield-account"></i>
+                    Administradores
+                </h3>
+                <p class="text-sm opacity-70 mb-4">Crear, editar y eliminar cuentas de administradores del sistema</p>
+                <div class="card-actions justify-end">
+                    <a href="{{ url_for('superadmin.gestionar_administradores') }}"
+                        class="btn btn-warning btn-sm gap-2">
+                        <i class="mdi mdi-cog"></i>
+                        Gestionar
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gestionar Practicantes -->
+        <div
+            class="card bg-gradient-to-br from-cyan-50 to-cyan-100 shadow-lg border-l-4 border-cyan-500 hover:shadow-xl transition-all duration-300">
+            <div class="card-body">
+                <div class="flex items-center justify-between mb-4">
+                    <i class="mdi mdi-account-school-outline text-5xl text-cyan-600 opacity-20"></i>
+                </div>
+                <h3 class="card-title text-cyan-700 mb-2">
+                    <i class="mdi mdi-account-school-outline"></i>
+                    Practicantes
+                </h3>
+                <p class="text-sm opacity-70 mb-4">Administrar todas las cuentas de practicantes registrados</p>
+                <div class="card-actions justify-end">
+                    <a href="{{ url_for('practicantes.lista') }}" class="btn btn-info btn-sm gap-2">
+                        <i class="mdi mdi-account-group"></i>
+                        Gestionar
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gestionar Incidentes -->
+        <div
+            class="card bg-gradient-to-br from-teal-50 to-teal-100 shadow-lg border-l-4 border-teal-500 hover:shadow-xl transition-all duration-300">
+            <div class="card-body">
+                <div class="flex items-center justify-between mb-4">
+                    <i class="mdi mdi-clipboard-list-outline text-5xl text-teal-600 opacity-20"></i>
+                </div>
+                <h3 class="card-title text-teal-700 mb-2">
+                    <i class="mdi mdi-clipboard-list-outline"></i>
+                    Incidentes
+                </h3>
+                <p class="text-sm opacity-70 mb-4">Ver y administrar todos los incidentes del sistema</p>
+                <div class="card-actions justify-end">
+                    <a href="{{ url_for('incidentes.lista') }}" class="btn btn-success btn-sm gap-2">
+                        <i class="mdi mdi-format-list-bulleted"></i>
+                        Ver Todos
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="divider"></div>
+</div>
+{% endif %}
+<!-- FIN SECCIÓN SUPER ADMIN -->
+
+
 <!-- Stats Grid -->
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
     <!-- Total Incidentes -->
@@ -114,7 +204,9 @@
             <h3 class="card-title text-lg mb-4 flex items-center gap-2">
                 <i class="mdi mdi-chart-bar text-primary"></i> Incidentes por Prioridad
             </h3>
-            <canvas id="chartPrioridad"></canvas>
+            <div class="h-64 sm:h-72 flex items-center justify-center">
+                <canvas id="chartPrioridad"></canvas>
+            </div>
         </div>
     </div>
 
@@ -123,10 +215,13 @@
             <h3 class="card-title text-lg mb-4 flex items-center gap-2">
                 <i class="mdi mdi-doughnut text-primary"></i> Incidentes por Tipo
             </h3>
-            <canvas id="chartTipo"></canvas>
+            <div class="h-64 sm:h-72 flex items-center justify-center">
+                <canvas id="chartTipo"></canvas>
+            </div>
         </div>
     </div>
 </div>
+
 
 <!-- Practicantes List -->
 <div class="card bg-base-100 shadow-lg border border-base-300 mb-8">
@@ -136,31 +231,32 @@
         </h3>
         <div class="space-y-4">
             {% if incidentes_por_practicante and incidentes_por_practicante|length > 0 %}
-                {% set max_total = incidentes_por_practicante | map(attribute='total') | max %}
-                {% for item in incidentes_por_practicante %}
-                <div class="flex items-center gap-4">
-                    <div class="w-40 flex items-center gap-2">
-                        <i class="mdi mdi-account-circle text-lg text-primary"></i>
-                        <span class="font-medium text-sm">{{ item.nombre }}</span>
-                    </div>
-                    <div class="flex-1">
-                        <div class="w-full bg-base-300 rounded-full h-3 overflow-hidden">
-                            <div class="bg-gradient-to-r from-primary to-secondary h-3 rounded-full transition-all duration-500"
-                                 style="width: {{ (item.total / max_total * 100) if max_total > 0 else 0 }}%"></div>
-                        </div>
-                    </div>
-                    <div class="w-16 text-right font-bold text-primary">{{ item.total }}</div>
+            {% set max_total = incidentes_por_practicante | map(attribute='total') | max %}
+            {% for item in incidentes_por_practicante %}
+            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
+                <div class="w-full sm:w-40 flex items-center gap-2">
+                    <i class="mdi mdi-account-circle text-lg text-primary"></i>
+                    <span class="font-medium text-sm">{{ item.nombre }}</span>
                 </div>
-                {% endfor %}
+                <div class="flex-1 w-full flex items-center gap-3">
+                    <div class="flex-1 bg-base-300 rounded-full h-3 overflow-hidden">
+                        <div class="bg-gradient-to-r from-primary to-secondary h-3 rounded-full transition-all duration-500"
+                            style="width: {{ (item.total / max_total * 100) if max_total > 0 else 0 }}%"></div>
+                    </div>
+                    <div class="w-12 text-right font-bold text-primary">{{ item.total }}</div>
+                </div>
+            </div>
+            {% endfor %}
             {% else %}
-                <div class="text-center py-12 opacity-60">
-                    <i class="mdi mdi-inbox-multiple-outline text-5xl mb-2 block opacity-30"></i>
-                    <p>No hay incidentes asignados a practicantes aún.</p>
-                </div>
+            <div class="text-center py-12 opacity-60">
+                <i class="mdi mdi-inbox-multiple-outline text-5xl mb-2 block opacity-30"></i>
+                <p>No hay incidentes asignados a practicantes aún.</p>
+            </div>
             {% endif %}
         </div>
     </div>
 </div>
+
 
 <!-- Últimos Incidentes Table -->
 <div class="card bg-base-100 shadow-lg border border-base-300">
@@ -168,7 +264,9 @@
         <h3 class="card-title text-lg mb-4 flex items-center gap-2">
             <i class="mdi mdi-clock-outline text-primary"></i> Últimos 10 Incidentes
         </h3>
-        <div class="overflow-x-auto">
+
+        <!-- Tabla Desktop (oculta en móvil) -->
+        <div class="hidden lg:block overflow-x-auto">
             <table class="table table-sm w-full">
                 <thead class="bg-base-200">
                     <tr>
@@ -181,31 +279,72 @@
                 </thead>
                 <tbody>
                     {% if ultimos_incidentes %}
-                        {% for inc in ultimos_incidentes %}
-                        <tr class="hover:bg-base-200 transition">
-                            <td class="font-bold text-primary">#{{ inc.id }}</td>
-                            <td>{{ inc.fecha_incidente.strftime('%d/%m/%Y') }}</td>
-                            <td>{{ inc.nombre_usuario }}</td>
-                            <td class="max-w-xs truncate">{{ inc.descripcion[:50] }}...</td>
-                            <td>
-                                <span class="badge {% if inc.prioridad.upper() == 'ALTA' %}badge-error{% elif inc.prioridad.upper() == 'MEDIA' %}badge-warning{% else %}badge-success{% endif %}">
-                                    {{ inc.prioridad }}
-                                </span>
-                            </td>
-                        </tr>
-                        {% endfor %}
+                    {% for inc in ultimos_incidentes %}
+                    <tr class="hover:bg-base-200 transition">
+                        <td class="font-bold text-primary">#{{ inc.id }}</td>
+                        <td>{{ inc.fecha_incidente.strftime('%d/%m/%Y') }}</td>
+                        <td>{{ inc.nombre_usuario }}</td>
+                        <td class="max-w-xs truncate">{{ inc.descripcion[:50] }}...</td>
+                        <td>
+                            <span
+                                class="badge {% if inc.prioridad.upper() == 'ALTA' %}badge-error{% elif inc.prioridad.upper() == 'MEDIA' %}badge-warning{% else %}badge-success{% endif %}">
+                                {{ inc.prioridad }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
                     {% else %}
-                        <tr>
-                            <td colspan="5" class="text-center py-12 opacity-60">
-                                <i class="mdi mdi-information-outline"></i> No hay incidentes registrados
-                            </td>
-                        </tr>
+                    <tr>
+                        <td colspan="5" class="text-center py-12 opacity-60">
+                            <i class="mdi mdi-information-outline"></i> No hay incidentes registrados
+                        </td>
+                    </tr>
                     {% endif %}
                 </tbody>
             </table>
         </div>
+
+        <!-- Cards Móvil (ocultas en desktop) -->
+        <div class="lg:hidden space-y-3">
+            {% if ultimos_incidentes %}
+            {% for inc in ultimos_incidentes %}
+            <div class="card bg-base-100 border border-base-300 shadow-sm">
+                <div class="card-body p-4">
+                    <div class="flex items-start justify-between mb-2">
+                        <span class="font-bold text-primary text-lg">#{{ inc.id }}</span>
+                        <span
+                            class="badge {% if inc.prioridad.upper() == 'ALTA' %}badge-error{% elif inc.prioridad.upper() == 'MEDIA' %}badge-warning{% else %}badge-success{% endif %}">
+                            {{ inc.prioridad }}
+                        </span>
+                    </div>
+
+                    <div class="space-y-2 text-sm">
+                        <p class="flex items-center gap-2">
+                            <i class="mdi mdi-calendar-outline opacity-70"></i>
+                            <span>{{ inc.fecha_incidente.strftime('%d/%m/%Y') }}</span>
+                        </p>
+                        <p class="flex items-center gap-2">
+                            <i class="mdi mdi-account-outline opacity-70"></i>
+                            <span class="font-medium">{{ inc.nombre_usuario }}</span>
+                        </p>
+                        <p class="flex items-start gap-2">
+                            <i class="mdi mdi-text-box-outline opacity-70 mt-1"></i>
+                            <span class="line-clamp-2">{{ inc.descripcion }}</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="text-center py-12 opacity-60">
+                <i class="mdi mdi-information-outline text-4xl mb-2 block opacity-30"></i>
+                <p class="text-sm">No hay incidentes registrados</p>
+            </div>
+            {% endif %}
+        </div>
     </div>
 </div>
+
 {% endblock %}
 
 {% block scripts %}
@@ -219,16 +358,16 @@
             datasets: [{
                 label: 'Incidentes',
                 data: [{{ prioridad_alta }}, {{ prioridad_media }}, {{ prioridad_baja }}],
-                backgroundColor: ['#ef4444', '#f59e0b', '#10b981'],
-                borderRadius: 8,
-                borderSkipped: false
+        backgroundColor: ['#ef4444', '#f59e0b', '#10b981'],
+        borderRadius: 8,
+        borderSkipped: false
             }]
         },
         options: {
-            responsive: true,
-            plugins: { legend: { display: false } },
-            scales: { y: { beginAtZero: true } }
-        }
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true } }
+    }
     });
 
     // Gráfico de Tipo
@@ -236,10 +375,10 @@
     new Chart(ctxTipo, {
         type: 'doughnut',
         data: {
-            labels: [{% for tipo, count in incidentes_por_tipo %}'{{ tipo }}',{% endfor %}],
-            datasets: [{
-                data: [{% for tipo, count in incidentes_por_tipo %}{{ count }},{% endfor %}],
-                backgroundColor: ['#2563eb', '#9c27b0', '#ff9800', '#607d8b', '#10b981', '#ff5722']
+            labels: [{% for tipo, count in incidentes_por_tipo %}'{{ tipo }}', {% endfor %}],
+        datasets: [{
+            data: [{% for tipo, count in incidentes_por_tipo %}{{ count }}, {% endfor %}],
+        backgroundColor: ['#2563eb', '#9c27b0', '#ff9800', '#607d8b', '#10b981', '#ff5722']
             }]
         },
         options: { responsive: true }

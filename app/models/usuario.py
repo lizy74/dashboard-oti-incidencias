@@ -24,6 +24,26 @@ class Usuario(UserMixin, db.Model):
     
     def __repr__(self):
         return f'<Usuario {self.username}>'
+    
+    def es_superadmin(self):
+        """Verifica si el usuario es super administrador"""
+        return self.rol == 'superadmin'
+
+    def es_admin(self):
+        """Verifica si el usuario es administrador (incluye superadmin)"""
+        return self.rol in ['admin', 'superadmin']
+
+    def es_practicante(self):
+        """Verifica si el usuario es practicante"""
+        return self.rol == 'practicante'
+
+    def puede_gestionar_admins(self):
+        """Solo superadmin puede gestionar administradores"""
+        return self.rol == 'superadmin'
+    
+    def __repr__(self):
+        return f'<Usuario {self.username}>'
+
 
 @login_manager.user_loader
 def load_user(user_id):
